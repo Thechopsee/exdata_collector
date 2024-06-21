@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'Models/Boat.dart';
 import 'Services/LocalSaver.dart';
+import 'Services/OnlineSaver.dart';
 import 'addNewBoatScreen.dart';
 import 'addNewScoreScreen.dart';
 import 'runList.dart';
@@ -76,6 +77,9 @@ class _MyHomePageState extends State<MyHomePage> {
     );
     _loadItems();
   }
+  void _Synchronize() async {
+    await OnlineSaver.Synchronize();
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -91,9 +95,9 @@ class _MyHomePageState extends State<MyHomePage> {
             title: Text(_items[index].name.toString()),
             subtitle: Text(_items[index].boatClass.toString()),
             onTap: () {
-              _navigateToNewScreen(_items[index].id);
+              _navigateToNewScreen(_items[index].bID);
             },
-            onLongPress: () {_navigateRunList(_items[index].id);},
+            onLongPress: () {_navigateRunList(_items[index].bID);},
           );
         },
       ),
@@ -106,12 +110,19 @@ class _MyHomePageState extends State<MyHomePage> {
             tooltip: 'Increment',
             child: const Icon(Icons.add),
           ),
-          SizedBox(height: 16),
+          const SizedBox(height: 16),
           FloatingActionButton(
             heroTag: 'uniqueTag2',
             onPressed: _navigateToNewBoat,
             tooltip: 'Navigate to New Boat',
             child: const Icon(Icons.directions_boat),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            heroTag: 'uniqueTag3',
+            onPressed: _Synchronize,
+            tooltip: 'synchronize',
+            child: const Icon(Icons.sync),
           ),
         ],
       ),

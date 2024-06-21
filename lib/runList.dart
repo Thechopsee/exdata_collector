@@ -17,7 +17,7 @@ class RunList extends StatelessWidget {
         itemCount: items.length,
         itemBuilder: (BuildContext context, int index) {
           return ListTile(
-            title: Text(items[index].id.toString()+" "+items[index].hit.toString()+""+items[index].directionHit.toString()),
+            title: Text(items[index].rid.toString()+" "+items[index].hit.toString()+""+items[index].directionHit.toString()),
           );
         },
       ),

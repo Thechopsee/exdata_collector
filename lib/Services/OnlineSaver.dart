@@ -3,11 +3,35 @@ import 'package:http/http.dart' as http;
 import 'package:exdata_collector/Models/Boat.dart';
 import 'package:exdata_collector/Models/Run.dart';
 
+import 'package:exdata_collector/Services/LocalSaver.dart';
+
 class OnlineSaver {
-  static const String baseUrl = 'http://yourapi.com';
+  static const String baseUrl = 'http://127.0.0.1:5000';
   static Future<void> Synchronize() async
   {
-    //check where is desynchronized
+    List<Boat> boats=await LocalSaver.loadAllBoats();
+    final headers = {'Content-Type': 'application/json'};
+    final body = jsonEncode({'boatList': boats.map((boat) => boat.toJson()).toList()});
+
+    final response = await http.post(Uri.parse(baseUrl+"/boats/sync"), headers: headers, body: body);
+
+    if (response.statusCode == 200) {
+    print('Boats synchronized successfully');
+    final List<dynamic> responseData = jsonDecode(response.body);
+      if (responseData.isEmpty) {
+      print('Boats are synchronized, no changes.');
+      } else {
+      List<Boat> updatedBoats = responseData.map((data) => Boat.fromJson(data)).toList();
+      print('Boats synchronized with updates: $updatedBoats');
+      for (int i = 0; i < updatedBoats.length; i++)
+        {
+          updatedBoats[i].dbID=updatedBoats[i].bID;
+        }
+      LocalSaver.updateBoatsData(boats:updatedBoats);
+      }
+    } else {
+    print('Failed to synchronize boats: ${response.statusCode}');
+  }
     
   }
   static Future<void> SynchronizeFromServer() async
@@ -53,14 +77,14 @@ class OnlineSaver {
   static Future<void> saveBoatData({
     required Boat boat,
   }) async {
-    final url = Uri.parse('$baseUrl/saveBoatData');
+    final url = Uri.parse('$baseUrl/boats');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: boat.toJson(),
+      body:  json.encode(boat.toJson()),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       print('Boat data saved successfully');
     } else {
       print('Failed to save boat data: ${response.statusCode}');

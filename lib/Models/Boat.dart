@@ -1,28 +1,32 @@
 class Boat {
-  int id = 0;
+  int bID = 0;
+  int dbID = 0;
   String? name;
   String? boatClass;
   Boat();
   void fromString(int id, String loadedString) {
     List<String> ad = loadedString.split(';');
-    this.id = id;
+    bID = id;
     name = ad[0];
     boatClass = ad[1];
+    if(ad.length>2) {
+      dbID = int.parse(ad[2]);
+    }
   }
 
   Boat.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
+      : bID = json['bID'],
         name = json['name'],
         boatClass = json['boatClass'];
 
   Map<String, dynamic> toJson() => {
-    'id': id,
+    'id': bID,
+    'dbID':dbID,
     'name': name,
     'boatClass': boatClass,
   };
 
-  // Metoda pro získání řetězce pro sloupec
   String toColumnString() {
-    return "$id $name";
+    return "$bID $name";
   }
 }

@@ -1,34 +1,34 @@
 class Run {
-  int id = 0;
+  int rid = 0;
   int boatID = 0;
-  int scopeToo = 0;
-  String? directionToo;
+  int scopeTo = 0;
+  String? directionTo;
   int hit = 0;
   String? directionHit;
 
   Run.fromString(String runString) {
     var splitData = runString.split(';');
-    id = int.parse(splitData[0]);
+    rid = int.parse(splitData[0]);
     boatID = int.parse(splitData[1]);
-    scopeToo = int.parse(splitData[2]);
-    directionToo = splitData[3];
+    scopeTo = int.parse(splitData[2]);
+    directionTo = splitData[3];
     hit = int.parse(splitData[4]);
     directionHit = splitData[5];
   }
 
   Run.fromJson(Map<String, dynamic> json)
-      : id = json['id'],
+      : rid = json['rid'],
         boatID = json['boatID'],
-        scopeToo = json['scopeToo'],
-        directionToo = json['directionToo'],
+        scopeTo = json['scopeToo'],
+        directionTo = json['directionToo'],
         hit = json['hit'],
         directionHit = json['directionHit'];
 
   Map<String, dynamic> toJson() => {
-    'id': id,
+    'rid': rid,
     'boatID': boatID,
-    'scopeToo': scopeToo,
-    'directionToo': directionToo,
+    'scopeToo': scopeTo,
+    'directionToo': directionTo,
     'hit': hit,
     'directionHit': directionHit,
   };
