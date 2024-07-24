@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'Models/Boat.dart';
+import 'Models/Race.dart';
 import 'Services/LocalSaver.dart';
 import 'Services/OnlineSaver.dart';
 import 'addNewBoatScreen.dart';
 import 'addNewScoreScreen.dart';
+import 'addNewRaceScreen.dart';
 import 'runList.dart';
 import "Models/Run.dart";
 
@@ -37,6 +39,7 @@ class MyHomePage extends StatefulWidget {
 
 class _MyHomePageState extends State<MyHomePage> {
   List<Boat> _items = [];
+  List<Race> races=[];
 
   @override
   void initState() {
@@ -46,11 +49,40 @@ class _MyHomePageState extends State<MyHomePage> {
 
   _loadItems() async {
     List<Boat> loadedItems = await LocalSaver.loadAllBoats();
+    List<Race> loadedRaces =await LocalSaver.loadAllRaces();
+    print(loadedRaces);
     setState(() {
 
-
+      races=loadedRaces;
       _items = loadedItems;
     });
+  }
+
+  void _deleteData() {
+    showDialog(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          title: Text('Delete Data'),
+          content: Text('Are you sure you want to delete all data?'),
+          actions: <Widget>[
+            TextButton(
+              child: Text('Cancel'),
+              onPressed: () {
+                Navigator.of(context).pop();
+              },
+            ),
+            TextButton(
+              child: Text('Delete'),
+              onPressed: () {
+                LocalSaver.deleteData();
+                Navigator.of(context).pop();
+              },
+            ),
+          ],
+        );
+      },
+    );
   }
 
   void _navigateToNewScreen(int from) {
@@ -66,7 +98,14 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(
         builder: (context) => RunList(items: runlist,),
       ),
-    );
+    ).then((_){_loadItems();});
+  }
+  void  _navigateNewRace() async {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AddNewRaceScreen(),
+      ),
+    ).then((_){_loadItems();});
   }
 
   void _navigateToNewBoat() async {
@@ -74,8 +113,7 @@ class _MyHomePageState extends State<MyHomePage> {
       MaterialPageRoute(
         builder: (context) => addNewBoatScreen(),
       ),
-    );
-    _loadItems();
+    ).then((_){_loadItems();});
   }
   void _Synchronize() async {
     await OnlineSaver.Synchronize();
@@ -87,19 +125,62 @@ class _MyHomePageState extends State<MyHomePage> {
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
         title: Text(widget.title),
-      ),
-      body: ListView.builder(
-        itemCount: _items.length,
-        itemBuilder: (BuildContext context, int index) {
-          return ListTile(
-            title: Text(_items[index].name.toString()),
-            subtitle: Text(_items[index].boatClass.toString()),
-            onTap: () {
-              _navigateToNewScreen(_items[index].bID);
+        actions: <Widget>[
+          PopupMenuButton<String>(
+            onSelected: (String result) {
+              if (result == 'delete') {
+                _deleteData();
+              }
             },
-            onLongPress: () {_navigateRunList(_items[index].bID);},
-          );
-        },
+            itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'delete',
+                child: Text('Delete Data'),
+              ),
+            ],
+          ),
+        ],
+      ),
+      body: Column(
+        children: [
+          Expanded(
+            child: ListView.builder(
+              itemCount: _items.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(_items[index].name.toString()),
+                  subtitle: Text(_items[index].boatClass.toString()),
+                  onTap: () {
+                    _navigateToNewScreen(_items[index].bID);
+                  },
+                  onLongPress: () {
+                    if (_items[index].dbID == 0) {
+                      _navigateRunList(_items[index].bID);
+                    } else {
+                      _navigateRunList(_items[index].dbID);
+                    }
+                  },
+                );
+              },
+            ),
+          ),
+          Divider(), // Optional: Adds a separator between the lists
+          Expanded(
+            child: ListView.builder(
+              itemCount: races.length,
+              itemBuilder: (BuildContext context, int index) {
+                return ListTile(
+                  title: Text(races[index].name.toString()),
+                  subtitle: Text(races[index].date.toString()),
+                  onTap: () {
+                    //_navigateToNewScreen(_items[index].bID);
+                  },
+
+                );
+              },
+            ),
+          ),
+        ],
       ),
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
@@ -116,6 +197,13 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: _navigateToNewBoat,
             tooltip: 'Navigate to New Boat',
             child: const Icon(Icons.directions_boat),
+          ),
+          const SizedBox(height: 16),
+          FloatingActionButton(
+            heroTag: 'uniqueTag6',
+            onPressed: _navigateNewRace,
+            tooltip: 'Navigate to New Race',
+            child: const Icon(Icons.date_range),
           ),
           const SizedBox(height: 16),
           FloatingActionButton(

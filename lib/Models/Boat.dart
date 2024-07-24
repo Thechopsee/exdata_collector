@@ -5,7 +5,9 @@ class Boat {
   String? boatClass;
   Boat();
   void fromString(int id, String loadedString) {
+    print(loadedString);
     List<String> ad = loadedString.split(';');
+    print(loadedString);
     bID = id;
     name = ad[0];
     boatClass = ad[1];
@@ -27,6 +29,14 @@ class Boat {
   };
 
   String toColumnString() {
-    return "$bID $name";
+    if(dbID!=0)
+      {
+        return "$dbID $name";
+      }
+    else
+      {
+        return "$bID $name";
+      }
+
   }
 }
