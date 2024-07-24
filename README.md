@@ -1,16 +1,7 @@
 # exdata_collector
+## En <br>
+Application for saving results for EX-500,EX-A category ship models. The architecture was designed using the Repository pattern, where data is primarily stored on the device and is distributed among all users using server synchronization.
+## CZE <br>
+Aplikace ,pro ukladaní vysledků pro modely lodí kategorie EX-500,EX-A. Aplikace je aktualně v testovací fazi.
 
-A new Flutter project.
 
-## Getting Started
-
-This project is a starting point for a Flutter application.
-
-A few resources to get you started if this is your first Flutter project:
-
-- [Lab: Write your first Flutter app](https://docs.flutter.dev/get-started/codelab)
-- [Cookbook: Useful Flutter samples](https://docs.flutter.dev/cookbook)
-
-For help getting started with Flutter development, view the
-[online documentation](https://docs.flutter.dev/), which offers tutorials,
-samples, guidance on mobile development, and a full API reference.
