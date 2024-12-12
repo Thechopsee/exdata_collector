@@ -1,0 +1,151 @@
+@startuml
+set namespaceSeparator ::
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::addNewBoatScreen.dart::addNewBoatScreen" {
+  +_NewScreenState createState()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::addNewBoatScreen.dart::_NewScreenState" {
+  -String? _selectedOption
+  -dynamic _textEditingController
+  +void dispose()
+  +dynamic build()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::addNewRaceScreen.dart::AddNewRaceScreen" {
+  +_AddNewRaceScreenState createState()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::addNewRaceScreen.dart::_AddNewRaceScreenState" {
+  -dynamic _formKey
+  -dynamic _nameController
+  -dynamic _dateController
+  +void dispose()
+  -void _submitForm()
+  +dynamic build()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::addNewScoreScreen.dart::addNewScoreScreen" {
+  +int from
+  +_addNewScoreScreenState createState()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::addNewScoreScreen.dart::_addNewScoreScreenState" {
+  +int boatID
+  -String? _selectedOption
+  -dynamic _textEditingController
+  -String? _secondSelectedOption
+  -dynamic _secondTextEditingController
+  -String? _boatSelection
+  -String? _raceSelection
+  -List<String> _boatOptionsC
+  +List<String> options
+  +List<Boat> boatOptions
+  +List<Race> races
+  -List<String> _racesC
+  +bool showCombo
+  +void loadOptions()
+  +void initState()
+  +void dispose()
+  +dynamic build()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::main.dart::MyApp" {
+  +dynamic build()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::main.dart::MyHomePage" {
+  +String title
+  +dynamic createState()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::main.dart::_MyHomePageState" {
+  -List<Boat> _items
+  +List<Race> races
+  +void initState()
+  -dynamic _loadItems()
+  -void _deleteData()
+  -void _navigateToNewScreen()
+  -void _navigateRunList()
+  -void _navigateNewRace()
+  -void _navigateToNewBoat()
+  -void _Synchronize()
+  +dynamic build()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::Models::Boat.dart::Boat" {
+  +int bID
+  +int dbID
+  +String? name
+  +String? boatClass
+  +void fromString()
+  +Map<String, dynamic> toJson()
+  +String toColumnString()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::Models::Race.dart::Race" {
+  +String name
+  +DateTime date
+  +int rcid
+  +int drcid
+  +Map<String, dynamic> toJson()
+  +String toString()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::Models::Run.dart::Run" {
+  +int rid
+  +int drid
+  +int boatID
+  +int scopeTo
+  +String? directionTo
+  +int hit
+  +String? directionHit
+  +int rcid
+  +Map<String, dynamic> toJson()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::runList.dart::RunList" {
+  +List<Run> items
+  +dynamic build()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::Services::LocalSaver.dart::LocalSaver" {
+  {static} +void saveRunData()
+  {static} +dynamic loadRunData()
+  {static} +void deleteData()
+  {static} +dynamic loadAllRunData()
+  {static} +void updateRacesData()
+  {static} +void updateBoatsData()
+  {static} +void updateRunsData()
+  {static} +void saveBoatData()
+  {static} +dynamic loadAllRaces()
+  {static} +dynamic loadRaceData()
+  {static} +dynamic loadBoatData()
+  {static} +dynamic loadAllBoats()
+  {static} +void saveRaceData()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::Services::OnlineSaver.dart::OnlineSaver" {
+  {static} +String baseUrl
+  {static} +dynamic SynchronizeRaces()
+  {static} +dynamic Synchronize()
+  {static} +dynamic SynchronizeRun()
+  {static} +dynamic SynchronizeFromServer()
+  {static} +dynamic SynchronizeToServer()
+  {static} +dynamic saveRunData()
+  {static} +dynamic loadAllRunData()
+  {static} +dynamic saveBoatData()
+  {static} +dynamic loadAllBoats()
+  {static} +dynamic saveRaceData()
+  {static} +dynamic loadAllRaces()
+}
+
+class "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::Services::SyncInfoProvider.dart::SyncInfoProvider" {
+  {static} -SyncInfoProvider _instance
+  +bool syncStatus
+  {static} +SyncInfoProvider instance
+  +dynamic fetchSynchronizationStatus()
+}
+
+"file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::Services::SyncInfoProvider.dart::SyncInfoProvider" o-- "file:::::::C:::Users::sebastian.walenta::Documents::GitHub::exdata_collector::lib::Services::SyncInfoProvider.dart::SyncInfoProvider"
+@enduml

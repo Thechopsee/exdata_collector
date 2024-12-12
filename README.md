@@ -5,3 +5,5 @@ Application for saving results for EX-500,EX-A category ship models. The archite
 Aplikace ,pro ukladaní vysledků pro modely lodí kategorie EX-500,EX-A. Aplikace je aktualně v testovací fazi.
 
 
+## Generate diagram
+https://pub.dev/packages/dcdg
