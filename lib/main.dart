@@ -188,7 +188,7 @@ class _MyHomePageState extends State<MyHomePage> {
           FloatingActionButton(
             heroTag: 'uniqueTag1',
             onPressed: () {_navigateToNewScreen(-1);},
-            tooltip: 'Increment',
+            tooltip: 'Add New Score',
             child: const Icon(Icons.add),
           ),
           const SizedBox(height: 16),

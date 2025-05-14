@@ -12,6 +12,25 @@ class addNewScoreScreen extends StatefulWidget {
 }
 
 class _addNewScoreScreenState extends State<addNewScoreScreen> {
+  void _showNoRacesDialog() {
+    showDialog(
+      context: context,
+      barrierDismissible: false,
+      builder: (context) => AlertDialog(
+        title: const Text("No Race "),
+        content: const Text("Unfortunately, there are no races available"),
+        actions: [
+          TextButton(
+            onPressed: () {
+              Navigator.pop(context);
+              Navigator.pop(context);
+            },
+            child: const Text("OK"),
+          ),
+        ],
+      ),
+    );
+  }
   void loadOptions ()async
   {
     boatOptions=await LocalSaver.loadAllBoats();
@@ -25,6 +44,10 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
         _boatOptionsC.add(boatOptions[i].toColumnString());
       }
     _boatSelection = _boatOptionsC[0];
+    if(_racesC.length==0)
+      {
+        Future.microtask(() => _showNoRacesDialog());
+      }
     _raceSelection=_racesC[0];
   }
   int boatID = 0;
