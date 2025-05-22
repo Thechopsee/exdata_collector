@@ -12,13 +12,14 @@ class LocalSaver {
     required String scopeToo,
     required String directionTOO,
     required int rcid,
+    required String intentedPartOfGate,
   }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? index=prefs.getInt("runNums");
     index ??= 0;
     index+=1;
     prefs.setInt('runNums', index);
-    String s="$index;$boatID;$scope;$scopeToo;$hit;$directionTOO;0;$rcid";
+    String s="$index;$boatID;$scope;$scopeToo;$hit;$directionTOO;0;$rcid;$intentedPartOfGate;${DateTime.now().toIso8601String()}";
     prefs.setString('run$index',s );
   }
   static Future<List<Run>> loadRunData({required int id})
@@ -102,13 +103,15 @@ class LocalSaver {
   static void saveBoatData({
     required String text,
     required String selectedOption,
+    String? seconds,
+    String? explanation,
   }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? index=prefs.getInt("boatNums");
     index ??= 0;
     index+=1;
     prefs.setInt("boatNums", index);
-    prefs.setString('boat$index', '$text;$selectedOption;0');
+    prefs.setString('boat$index', '$text;$selectedOption;0;$seconds;$explanation');
   }
   static Future<List<Race>> loadAllRaces() async
   {
@@ -143,6 +146,7 @@ class LocalSaver {
   static Future<List<Boat>> loadAllBoats() async
   {
     SharedPreferences prefs = await SharedPreferences.getInstance();
+    //await prefs.clear();
     //prefs.setInt("boatNums", 0);
     int? index=prefs.getInt("boatNums");
     List<Boat> boats=[];

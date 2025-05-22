@@ -3,6 +3,9 @@ class Boat {
   int dbID = 0;
   String? name;
   String? boatClass;
+  String? timerSeconds;
+  String? timerExplanation;
+
   Boat();
   void fromString(int id, String loadedString) {
     print(loadedString);
@@ -14,18 +17,26 @@ class Boat {
     if(ad.length>2) {
       dbID = int.parse(ad[2]);
     }
+    if(ad.length==5) {
+      timerSeconds = ad[3];
+      timerExplanation = ad[4];
+    }
   }
 
   Boat.fromJson(Map<String, dynamic> json)
       : bID = json['bID'],
         name = json['name'],
-        boatClass = json['boatClass'];
+        boatClass = json['boatClass'],
+        timerSeconds = json['timerSeconds'],
+        timerExplanation = json['timerExplanation'];
 
   Map<String, dynamic> toJson() => {
     'id': bID,
     'dbID':dbID,
     'name': name,
     'boatClass': boatClass,
+    'timerSeconds': timerSeconds,
+    'timerExplanation': timerExplanation,
   };
 
   String toColumnString() {

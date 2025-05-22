@@ -31,6 +31,25 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
       ),
     );
   }
+  Future<void> showNoBoatDialog() async
+  {
+    await showDialog(
+    context: context,
+    builder: (context) => AlertDialog(
+      title: Text('Warning'),
+      content: Text('Zatím nejsou vyplněny žádné lodě.'),
+      actions: [
+        TextButton(
+          onPressed: () {
+            Navigator.of(context).pop();
+            Navigator.of(context).pop();
+          },
+          child: Text('OK'),
+        ),
+      ],
+    ),
+    );
+  }
   void loadOptions ()async
   {
     boatOptions=await LocalSaver.loadAllBoats();
@@ -43,6 +62,11 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
       {
         _boatOptionsC.add(boatOptions[i].toColumnString());
       }
+    if (_boatOptionsC.length < 1) {
+        await showNoBoatDialog();
+      return;
+    }
+
     _boatSelection = _boatOptionsC[0];
     if(_racesC.length==0)
       {
@@ -52,6 +76,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
   }
   int boatID = 0;
   String? _selectedOption;
+  String? _gatePartSelected;
   TextEditingController _textEditingController = TextEditingController();
   String? _secondSelectedOption;
   TextEditingController _secondTextEditingController = TextEditingController();
@@ -101,7 +126,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const Text(
-              'Score:',
+              'Intended Score:',
               style: TextStyle(fontSize: 18),
             ),
             TextField(
@@ -149,9 +174,47 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
                 const Text('P'),
               ],
             ),
+            const Text(
+              'In with part of gate:',
+              style: TextStyle(fontSize: 18),
+            ),
+            Row(
+              children: [
+                Radio<String>(
+                  value: 'L',
+                  groupValue: _gatePartSelected,
+                  onChanged: (value) {
+                    setState(() {
+                      _gatePartSelected = value;
+                    });
+                  },
+                ),
+                const Text('L'),
+                Radio<String>(
+                  value: 'S',
+                  groupValue: _gatePartSelected,
+                  onChanged: (value) {
+                    setState(() {
+                      _gatePartSelected = value;
+                    });
+                  },
+                ),
+                const Text('S'),
+                Radio<String>(
+                  value: 'P',
+                  groupValue: _gatePartSelected,
+                  onChanged: (value) {
+                    setState(() {
+                      _gatePartSelected = value;
+                    });
+                  },
+                ),
+                const Text('P'),
+              ],
+            ),
             const SizedBox(height: 20),
             const Text(
-              'Score:',
+              'Gained Score:',
               style: TextStyle(fontSize: 18),
             ),
             TextField(
@@ -261,7 +324,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
                   if(showCombo) {
                     boatID = int.parse(_boatSelection.toString().split(" ")[0]);
                   }
-                  int raceid = int.parse(_boatSelection.toString().split(" ")[0]);
+                  int raceid = int.parse(_raceSelection.toString().split(" ")[0]);
                   print(boatID);
                   LocalSaver.saveRunData(
                       boatID: boatID,
@@ -269,10 +332,12 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
                       hit: int.parse(_secondTextEditingController.text.toString()),
                       scopeToo: _selectedOption.toString(),
                       directionTOO: _secondSelectedOption.toString(),
-                      rcid:raceid);
+                      rcid:raceid,
+                      intentedPartOfGate: _gatePartSelected.toString(),
+                  );
                   Navigator.pop(context);
                 },
-                child: const Text('Send'),
+                child: const Text('Save'),
               ),
             ),
           ],

@@ -4,9 +4,11 @@ class Run {
   int boatID = 0;
   int scopeTo = 0;
   String? directionTo;
+  String? intentedPartOfGate;
   int hit = 0;
   String? directionHit;
   int rcid=0;
+  DateTime dateTime = DateTime.now();
 
   Run.fromString(String runString) {
     var splitData = runString.split(';');
@@ -18,6 +20,8 @@ class Run {
     directionHit = splitData[5];
     drid=int.parse(splitData[6]);
     rcid=int.parse(splitData[7]);
+    intentedPartOfGate = splitData[8] ;
+    dateTime = DateTime.parse(splitData[9]);
   }
 
   Run.fromJson(Map<String, dynamic> json)
@@ -28,7 +32,11 @@ class Run {
         directionTo = json['directionToo'],
         hit = json['hit'],
         directionHit = json['directionHit'],
+        dateTime = DateTime.parse(json['dateTime']),
+        intentedPartOfGate = json['intentedPartOfGate'],
         rcid=json["rcid"];
+
+
 
   Map<String, dynamic> toJson() => {
     'rid': rid,
@@ -38,6 +46,8 @@ class Run {
     'directionToo': directionTo,
     'hit': hit,
     'directionHit': directionHit,
+    'dateTime': dateTime.toIso8601String(),
+    'intentedPartOfGate': intentedPartOfGate,
     'rcid':rcid,
   };
 }

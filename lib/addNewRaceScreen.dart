@@ -56,7 +56,26 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
               ),
               TextFormField(
                 controller: _dateController,
-                decoration: InputDecoration(labelText: 'Date (MM/DD/YYYY)'),
+                decoration: InputDecoration(
+                  labelText: 'Date (MM/DD/YYYY)',
+                  suffixIcon: IconButton(
+                    icon: Icon(Icons.calendar_today),
+                    onPressed: () async {
+                      DateTime? pickedDate = await showDatePicker(
+                        context: context,
+                        initialDate: DateTime.now(),
+                        firstDate: DateTime(1900),
+                        lastDate: DateTime(2100),
+                      );
+                      if (pickedDate != null) {
+                        String formattedDate = DateFormat.yMd().format(pickedDate);
+                        setState(() {
+                          _dateController.text = formattedDate;
+                        });
+                      }
+                    },
+                  ),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return 'Please enter a date';
@@ -69,6 +88,7 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
                   return null;
                 },
               ),
+
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _submitForm,

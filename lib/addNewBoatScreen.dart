@@ -11,12 +11,17 @@ class addNewBoatScreen extends StatefulWidget {
 class _NewScreenState extends State<addNewBoatScreen> {
   String? _selectedOption;
   final TextEditingController _textEditingController = TextEditingController();
+  final TextEditingController _secondsController = TextEditingController();
+  final TextEditingController _explainController = TextEditingController();
 
   @override
   void dispose() {
     _textEditingController.dispose();
+    _secondsController.dispose();
+    _explainController.dispose();
     super.dispose();
   }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -30,20 +35,7 @@ class _NewScreenState extends State<addNewBoatScreen> {
           children: [
             const SizedBox(height: 20),
             const Text(
-              'Name:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-            ),
-            const SizedBox(height: 10),
-            TextFormField(
-              controller: _textEditingController,
-              decoration: const InputDecoration(
-                hintText: 'Enter boat name',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Choose an option:',
+              'Category:',
               style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
@@ -55,6 +47,9 @@ class _NewScreenState extends State<addNewBoatScreen> {
                   onChanged: (value) {
                     setState(() {
                       _selectedOption = value;
+                      // Vyčistit extra pole když změní na EX-500
+                      _secondsController.clear();
+                      _explainController.clear();
                     });
                   },
                 ),
@@ -72,21 +67,96 @@ class _NewScreenState extends State<addNewBoatScreen> {
               ],
             ),
             const SizedBox(height: 20),
+            const Text(
+              'Name:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            TextFormField(
+              controller: _textEditingController,
+              decoration: const InputDecoration(
+                hintText: 'Enter boat name',
+                border: OutlineInputBorder(),
+              ),
+            ),
+
+            // Podmíněné zobrazení polí pro EX-A
+            if (_selectedOption == 'EX-A') ...[
+              const SizedBox(height: 20),
+              const Text(
+                'Seconds in timer:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _secondsController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: 'Enter seconds',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+              const SizedBox(height: 20),
+              const Text(
+                'Explain setting a timer:',
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              const SizedBox(height: 10),
+              TextFormField(
+                controller: _explainController,
+                decoration: const InputDecoration(
+                  hintText: 'Explain timer',
+                  border: OutlineInputBorder(),
+                ),
+              ),
+            ],
+
+            const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
                 String name = _textEditingController.text;
-                if (name.isNotEmpty && _selectedOption != null) {
-                  LocalSaver.saveBoatData(text:name, selectedOption: _selectedOption.toString());
-                  print('Name: $name, Option: $_selectedOption');
-                  Navigator.pop(context);
-                } else {
+
+                if (name.isEmpty || _selectedOption == null) {
                   ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
                     content: Text('Please fill all fields.'),
                     duration: Duration(seconds: 2),
                   ));
+                  return;
                 }
+
+                // Pokud je EX-A, ověřit, že číslo i text jsou vyplněné
+                if (_selectedOption == 'EX-A') {
+                  if (_secondsController.text.isEmpty ||
+                      int.tryParse(_secondsController.text) == null) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Please enter a valid number of seconds.'),
+                      duration: Duration(seconds: 2),
+                    ));
+                    return;
+                  }
+                  if (_explainController.text.isEmpty) {
+                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                      content: Text('Please explain the timer setting.'),
+                      duration: Duration(seconds: 2),
+                    ));
+                    return;
+                  }
+                }
+
+                // Uložit data včetně extra polí pro EX-A
+                LocalSaver.saveBoatData(
+                  text: name,
+                  selectedOption: _selectedOption.toString(),
+                  seconds: _secondsController.text,
+                  explanation: _explainController.text,
+                );
+
+                print(
+                    'Name: $name, Option: $_selectedOption, Seconds: ${_secondsController.text}, Explanation: ${_explainController.text}');
+
+                Navigator.pop(context);
               },
-              child: Text('Add Boat'),
+              child: const Text('Add Boat'),
             ),
           ],
         ),
