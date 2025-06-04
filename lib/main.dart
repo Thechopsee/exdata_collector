@@ -1,4 +1,3 @@
-import 'package:exdata_collector/RemoveBackground/RemoveBackgroundPage.dart';
 import 'package:flutter/material.dart';
 import 'Models/Boat.dart';
 import 'Models/Race.dart';
@@ -119,13 +118,7 @@ class _MyHomePageState extends State<MyHomePage> {
   void _Synchronize() async {
     await OnlineSaver.Synchronize();
   }
-  void _RMBCG() async {
-    await Navigator.of(context).push(
-      MaterialPageRoute(
-        builder: (context) => RemoveBackgroundPage(),
-      ),
-    );
-  }
+
 
 
   @override
@@ -220,13 +213,6 @@ class _MyHomePageState extends State<MyHomePage> {
             onPressed: _Synchronize,
             tooltip: 'synchronize',
             child: const Icon(Icons.sync),
-          ),
-          const SizedBox(height: 16),
-          FloatingActionButton(
-            heroTag: 'uniqueTag4',
-            onPressed: _RMBCG,
-            tooltip: 'backgroundRemover',
-            child: const Icon(Icons.abc),
           ),
         ],
       ),
