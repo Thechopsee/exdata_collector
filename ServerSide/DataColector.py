@@ -12,6 +12,8 @@ class Boat(db.Model):
     bID = db.Column(db.Integer, primary_key=True, autoincrement=True)
     name = db.Column(db.String, nullable=False)
     boatClass = db.Column(db.String, nullable=False)
+    timerSeconds = db.Column(db.String)
+    timerExplanation = db.Column(db.String)
     runs = db.relationship('Run', backref='boat', lazy=True)
 #DOdelat akce id
 class Run(db.Model):
@@ -22,6 +24,8 @@ class Run(db.Model):
     directionTo = db.Column(db.String)
     hit = db.Column(db.Integer)
     hitDirection = db.Column(db.String)
+    intentedPartOfGate = db.Column(db.String)
+    dateTime = db.Column(db.DateTime)
 
 class Race(db.Model):
     rcid = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -36,6 +40,13 @@ class Race(db.Model):
             'drcid': self.rcid,
         }
 
+    @staticmethod
+    def from_json(json_data):
+        return Race(
+            name=json_data.get('name'),
+            date=datetime.datetime.fromisoformat(json_data.get('date')) if json_data.get('date') else None
+        )
+
 @app.route('/boats/sync', methods=['POST'])
 def check_sync_boat():
     data = request.get_json()
@@ -44,12 +55,12 @@ def check_sync_boat():
     for x in idlist:
         if(x['dbID']<1):
             print(x)
-            new_boat = Boat(name=x['name'], boatClass=x['boatClass'])
+            new_boat = Boat(name=x['name'], boatClass=x['boatClass'], timerSeconds=x.get('timerSeconds'), timerExplanation=x.get('timerExplanation'))
             db.session.add(new_boat)
             db.session.commit()
             isUnsync=True
     boats = Boat.query.all()
-    boatArray=[{'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass} for boat in boats]
+    boatArray=[{'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation} for boat in boats]
     if(len(boatArray)!=len(idlist)):
         isUnsync=True
     if(isUnsync):
@@ -66,12 +77,13 @@ def check_sync_run():
     for x in idlist:
         if(x['drid']==0):
             print(x)
-            new_run=Run(boatID=x['boatID'],scopeTo=x['scopeToo'],directionTo=x['directionToo'],hit=x['hit'],hitDirection=x['directionHit'],rcid=x['rcid'])
+            dt = datetime.datetime.fromisoformat(x['dateTime']) if x.get('dateTime') else None
+            new_run=Run(boatID=x['boatID'],scopeTo=x['scopeToo'],directionTo=x['directionToo'],hit=x['hit'],hitDirection=x['directionHit'],rcid=x['rcid'], intentedPartOfGate=x.get('intentedPartOfGate'), dateTime=dt)
             db.session.add(new_run)
             db.session.commit()
             isUnsync=True
     runs = Run.query.all()
-    runsArray=[{'rid': run.rid,'drid':run.rid, 'boatID': run.boatID, 'scopeToo': run.scopeTo,'directionToo':run.directionTo,'hit':run.hit,'directionHit':run.hitDirection,'rcid':run.rcid} for run in runs]
+    runsArray=[{'rid': run.rid,'drid':run.rid, 'boatID': run.boatID, 'scopeToo': run.scopeTo,'directionToo':run.directionTo,'hit':run.hit,'directionHit':run.hitDirection,'rcid':run.rcid, 'intentedPartOfGate': run.intentedPartOfGate, 'dateTime': run.dateTime.isoformat() if run.dateTime else None} for run in runs]
     return jsonify(runsArray),200
 
 @app.route('/races/sync', methods=['POST'])
@@ -83,7 +95,7 @@ def check_sync_race():
     for x in idlist:
         if(x['drcid']==0):
             print(x)
-            date_object = datetime.datetime.strptime(x["date"], '%Y-%m-%dT%H:%M:%S.%f')
+            date_object = datetime.datetime.fromisoformat(x["date"])
             new_run=Race(name=x["name"],date=date_object)
             db.session.add(new_run)
             db.session.commit()
@@ -95,7 +107,7 @@ def check_sync_race():
 @app.route('/boats', methods=['POST'])
 def create_boat():
     data = request.get_json()
-    new_boat = Boat(name=data['name'], boatClass=data['boatClass'])
+    new_boat = Boat(name=data['name'], boatClass=data['boatClass'], timerSeconds=data.get('timerSeconds'), timerExplanation=data.get('timerExplanation'))
     db.session.add(new_boat)
     db.session.commit()
     return jsonify({'message': 'Boat created'}), 201
@@ -103,12 +115,12 @@ def create_boat():
 @app.route('/boats', methods=['GET'])
 def get_boats():
     boats = Boat.query.all()
-    return jsonify([{'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass} for boat in boats])
+    return jsonify([{'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation} for boat in boats])
 
 @app.route('/boats/<int:id>', methods=['GET'])
 def get_boat(id):
     boat = Boat.query.get_or_404(id)
-    return jsonify({'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass})
+    return jsonify({'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation})
 
 @app.route('/boats/<int:id>', methods=['PUT'])
 def update_boat(id):
@@ -116,6 +128,8 @@ def update_boat(id):
     boat = Boat.query.get_or_404(id)
     boat.name = data['name']
     boat.boatClass = data['boatClass']
+    boat.timerSeconds = data.get('timerSeconds')
+    boat.timerExplanation = data.get('timerExplanation')
     db.session.commit()
     return jsonify({'message': 'Boat updated'})
 
@@ -130,12 +144,16 @@ def delete_boat(id):
 @app.route('/runs', methods=['POST'])
 def create_run():
     data = request.get_json()
+    dt = datetime.datetime.fromisoformat(data['dateTime']) if data.get('dateTime') else None
     new_run = Run(
-        boat=data['boat'],
+        boatID=data['boatID'],
+        rcid=data['rcid'],
         scopeTo=data.get('scopeTo'),
         directionTo=data.get('directionTo'),
         hit=data.get('hit'),
-        hitDirection=data.get('hitDirection')
+        hitDirection=data.get('hitDirection'),
+        intentedPartOfGate=data.get('intentedPartOfGate'),
+        dateTime=dt
     )
     db.session.add(new_run)
     db.session.commit()
@@ -146,11 +164,14 @@ def get_runs():
     runs = Run.query.all()
     return jsonify([{
         'rid': run.rid,
-        'boatID': run.boat,
+        'boatID': run.boatID,
+        'rcid': run.rcid,
         'scopeTo': run.scopeTo,
         'directionTo': run.directionTo,
         'hit': run.hit,
-        'hitDirection': run.hitDirection
+        'hitDirection': run.hitDirection,
+        'intentedPartOfGate': run.intentedPartOfGate,
+        'dateTime': run.dateTime.isoformat() if run.dateTime else None
     } for run in runs])
 
 @app.route('/runs/<int:id>', methods=['GET'])
@@ -158,22 +179,29 @@ def get_run(id):
     run = Run.query.get_or_404(id)
     return jsonify({
         'rid': run.rid,
-        'boat': run.boat,
+        'boatID': run.boatID,
+        'rcid': run.rcid,
         'scopeTo': run.scopeTo,
         'directionTo': run.directionTo,
         'hit': run.hit,
-        'hitDirection': run.hitDirection
+        'hitDirection': run.hitDirection,
+        'intentedPartOfGate': run.intentedPartOfGate,
+        'dateTime': run.dateTime.isoformat() if run.dateTime else None
     })
 
 @app.route('/runs/<int:id>', methods=['PUT'])
 def update_run(id):
     data = request.get_json()
     run = Run.query.get_or_404(id)
-    run.boatID = data['boat']
+    run.boatID = data['boatID']
+    run.rcid = data['rcid']
     run.scopeTo = data.get('scopeTo')
     run.directionTo = data.get('directionTo')
     run.hit = data.get('hit')
     run.hitDirection = data.get('hitDirection')
+    run.intentedPartOfGate = data.get('intentedPartOfGate')
+    if data.get('dateTime'):
+        run.dateTime = datetime.datetime.fromisoformat(data['dateTime'])
     db.session.commit()
     return jsonify({'message': 'Run updated'})
 
@@ -212,11 +240,9 @@ def update_race(id):
     if 'name' in request.json:
         race.name = request.json['name']
     if 'date' in request.json:
-        race.date = datetime.fromisoformat(request.json['date'])
+        race.date = datetime.datetime.fromisoformat(request.json['date'])
     if 'rcid' in request.json:
         race.rcid = request.json['rcid']
-    if 'drcid' in request.json:
-        race.drcid = request.json['drcid']
     db.session.commit()
     return jsonify(race.to_json())
 
@@ -230,4 +256,3 @@ def delete_race(id):
 
 if __name__ == '__main__':
     app.run(debug=True)
-    
