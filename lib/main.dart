@@ -1,3 +1,4 @@
+import 'dart:convert';
 import 'package:exdata_collector/RemoveBackground/RemoveBackgroundPage.dart';
 import 'package:flutter/material.dart';
 import 'Models/Boat.dart';
@@ -157,6 +158,15 @@ class _MyHomePageState extends State<MyHomePage> {
               itemCount: _items.length,
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
+                  leading: (_items[index].image != null && _items[index].image!.isNotEmpty && _items[index].image != "null")
+                      ? Image.memory(
+                          base64Decode(_items[index].image!),
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) => const Icon(Icons.broken_image, size: 50),
+                        )
+                      : const Icon(Icons.directions_boat, size: 50),
                   title: Text(_items[index].name.toString()),
                   subtitle: Text(_items[index].boatClass.toString()),
                   onTap: () {
@@ -233,4 +243,3 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
 }
-

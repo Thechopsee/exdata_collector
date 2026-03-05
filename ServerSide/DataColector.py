@@ -14,6 +14,7 @@ class Boat(db.Model):
     boatClass = db.Column(db.String, nullable=False)
     timerSeconds = db.Column(db.String)
     timerExplanation = db.Column(db.String)
+    image = db.Column(db.String)
     runs = db.relationship('Run', backref='boat', lazy=True)
 #DOdelat akce id
 class Run(db.Model):
@@ -55,12 +56,12 @@ def check_sync_boat():
     for x in idlist:
         if(x['dbID']<1):
             print(x)
-            new_boat = Boat(name=x['name'], boatClass=x['boatClass'], timerSeconds=x.get('timerSeconds'), timerExplanation=x.get('timerExplanation'))
+            new_boat = Boat(name=x['name'], boatClass=x['boatClass'], timerSeconds=x.get('timerSeconds'), timerExplanation=x.get('timerExplanation'), image=x.get('image'))
             db.session.add(new_boat)
             db.session.commit()
             isUnsync=True
     boats = Boat.query.all()
-    boatArray=[{'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation} for boat in boats]
+    boatArray=[{'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation, 'image': boat.image} for boat in boats]
     if(len(boatArray)!=len(idlist)):
         isUnsync=True
     if(isUnsync):
@@ -107,7 +108,7 @@ def check_sync_race():
 @app.route('/boats', methods=['POST'])
 def create_boat():
     data = request.get_json()
-    new_boat = Boat(name=data['name'], boatClass=data['boatClass'], timerSeconds=data.get('timerSeconds'), timerExplanation=data.get('timerExplanation'))
+    new_boat = Boat(name=data['name'], boatClass=data['boatClass'], timerSeconds=data.get('timerSeconds'), timerExplanation=data.get('timerExplanation'), image=data.get('image'))
     db.session.add(new_boat)
     db.session.commit()
     return jsonify({'message': 'Boat created'}), 201
@@ -115,12 +116,12 @@ def create_boat():
 @app.route('/boats', methods=['GET'])
 def get_boats():
     boats = Boat.query.all()
-    return jsonify([{'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation} for boat in boats])
+    return jsonify([{'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation, 'image': boat.image} for boat in boats])
 
 @app.route('/boats/<int:id>', methods=['GET'])
 def get_boat(id):
     boat = Boat.query.get_or_404(id)
-    return jsonify({'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation})
+    return jsonify({'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation, 'image': boat.image})
 
 @app.route('/boats/<int:id>', methods=['PUT'])
 def update_boat(id):
@@ -130,6 +131,7 @@ def update_boat(id):
     boat.boatClass = data['boatClass']
     boat.timerSeconds = data.get('timerSeconds')
     boat.timerExplanation = data.get('timerExplanation')
+    boat.image = data.get('image')
     db.session.commit()
     return jsonify({'message': 'Boat updated'})
 

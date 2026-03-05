@@ -5,49 +5,52 @@ class Boat {
   String? boatClass;
   String? timerSeconds;
   String? timerExplanation;
+  String? image;
 
   Boat();
   void fromString(int id, String loadedString) {
-    print(loadedString);
     List<String> ad = loadedString.split(';');
-    print(loadedString);
     bID = id;
-    name = ad[0];
-    boatClass = ad[1];
-    if(ad.length>2) {
-      dbID = int.parse(ad[2]);
+    if (ad.length > 0) name = ad[0];
+    if (ad.length > 1) boatClass = ad[1];
+    if (ad.length > 2) {
+      dbID = int.tryParse(ad[2]) ?? 0;
     }
-    if(ad.length==5) {
-      timerSeconds = ad[3];
-      timerExplanation = ad[4];
+    if (ad.length > 3) {
+      timerSeconds = ad[3] == "" || ad[3] == "null" ? null : ad[3];
+    }
+    if (ad.length > 4) {
+      timerExplanation = ad[4] == "" || ad[4] == "null" ? null : ad[4];
+    }
+    if (ad.length > 5) {
+      image = ad[5] == "" || ad[5] == "null" ? null : ad[5];
     }
   }
 
   Boat.fromJson(Map<String, dynamic> json)
-      : bID = json['bID'],
+      : bID = json['bID'] ?? 0,
+        dbID = json['dbID'] ?? 0,
         name = json['name'],
         boatClass = json['boatClass'],
         timerSeconds = json['timerSeconds'],
-        timerExplanation = json['timerExplanation'];
+        timerExplanation = json['timerExplanation'],
+        image = json['image'];
 
   Map<String, dynamic> toJson() => {
-    'id': bID,
-    'dbID':dbID,
+    'bID': bID,
+    'dbID': dbID,
     'name': name,
     'boatClass': boatClass,
     'timerSeconds': timerSeconds,
     'timerExplanation': timerExplanation,
+    'image': image,
   };
 
   String toColumnString() {
-    if(dbID!=0)
-      {
-        return "$dbID $name";
-      }
-    else
-      {
-        return "$bID $name";
-      }
-
+    if (dbID != 0) {
+      return "$dbID $name";
+    } else {
+      return "$bID $name";
+    }
   }
 }
