@@ -1,5 +1,8 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:exdata_collector/Services/LocalSaver.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class addNewBoatScreen extends StatefulWidget {
   const addNewBoatScreen({Key? key}) : super(key: key);
@@ -13,6 +16,7 @@ class _NewScreenState extends State<addNewBoatScreen> {
   final TextEditingController _textEditingController = TextEditingController();
   final TextEditingController _secondsController = TextEditingController();
   final TextEditingController _explainController = TextEditingController();
+  String? _base64Image;
 
   @override
   void dispose() {
@@ -22,13 +26,29 @@ class _NewScreenState extends State<addNewBoatScreen> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 300,
+      maxHeight: 300,
+    );
+
+    if (image != null) {
+      final bytes = await image.readAsBytes();
+      setState(() {
+        _base64Image = base64Encode(bytes);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Boat'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
@@ -112,51 +132,82 @@ class _NewScreenState extends State<addNewBoatScreen> {
             ],
 
             const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: () {
-                String name = _textEditingController.text;
+            const Text(
+              'Boat Image:',
+              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            Center(
+              child: Column(
+                children: [
+                  if (_base64Image != null)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: 10.0),
+                      child: Image.memory(
+                        base64Decode(_base64Image!),
+                        width: 150,
+                        height: 150,
+                        fit: BoxFit.cover,
+                      ),
+                    ),
+                  ElevatedButton.icon(
+                    onPressed: _pickImage,
+                    icon: const Icon(Icons.image),
+                    label: const Text('Pick Image'),
+                  ),
+                ],
+              ),
+            ),
 
-                if (name.isEmpty || _selectedOption == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Please fill all fields.'),
-                    duration: Duration(seconds: 2),
-                  ));
-                  return;
-                }
+            const SizedBox(height: 30),
+            Center(
+              child: ElevatedButton(
+                onPressed: () {
+                  String name = _textEditingController.text;
 
-                // Pokud je EX-A, ověřit, že číslo i text jsou vyplněné
-                if (_selectedOption == 'EX-A') {
-                  if (_secondsController.text.isEmpty ||
-                      int.tryParse(_secondsController.text) == null) {
+                  if (name.isEmpty || _selectedOption == null) {
                     ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Please enter a valid number of seconds.'),
+                      content: Text('Please fill all fields.'),
                       duration: Duration(seconds: 2),
                     ));
                     return;
                   }
-                  if (_explainController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Please explain the timer setting.'),
-                      duration: Duration(seconds: 2),
-                    ));
-                    return;
+
+                  // Pokud je EX-A, ověřit, že číslo i text jsou vyplněné
+                  if (_selectedOption == 'EX-A') {
+                    if (_secondsController.text.isEmpty ||
+                        int.tryParse(_secondsController.text) == null) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Please enter a valid number of seconds.'),
+                        duration: Duration(seconds: 2),
+                      ));
+                      return;
+                    }
+                    if (_explainController.text.isEmpty) {
+                      ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
+                        content: Text('Please explain the timer setting.'),
+                        duration: Duration(seconds: 2),
+                      ));
+                      return;
+                    }
                   }
-                }
 
-                // Uložit data včetně extra polí pro EX-A
-                LocalSaver.saveBoatData(
-                  text: name,
-                  selectedOption: _selectedOption.toString(),
-                  seconds: _secondsController.text,
-                  explanation: _explainController.text,
-                );
+                  // Uložit data včetně extra polí pro EX-A a obrázku
+                  LocalSaver.saveBoatData(
+                    text: name,
+                    selectedOption: _selectedOption.toString(),
+                    seconds: _secondsController.text,
+                    explanation: _explainController.text,
+                    image: _base64Image,
+                  );
 
-                print(
-                    'Name: $name, Option: $_selectedOption, Seconds: ${_secondsController.text}, Explanation: ${_explainController.text}');
+                  print(
+                      'Name: $name, Option: $_selectedOption, Seconds: ${_secondsController.text}, Explanation: ${_explainController.text}');
 
-                Navigator.pop(context);
-              },
-              child: const Text('Add Boat'),
+                  Navigator.pop(context);
+                },
+                child: const Text('Add Boat'),
+              ),
             ),
           ],
         ),

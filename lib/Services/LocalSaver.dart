@@ -77,7 +77,10 @@ class LocalSaver {
       String? name=boats[i].name;
       String? boatClass=boats[i].boatClass;
       int dbID = boats[i].dbID;
-      prefs.setString('boat$index', '$name;$boatClass;$dbID');
+      String timerSeconds = boats[i].timerSeconds ?? "";
+      String timerExplanation = boats[i].timerExplanation ?? "";
+      String image = boats[i].image ?? "";
+      prefs.setString('boat$index', '$name;$boatClass;$dbID;$timerSeconds;$timerExplanation;$image');
     }
   }
   static void updateRunsData({required List<Run> runs})
@@ -105,13 +108,17 @@ class LocalSaver {
     required String selectedOption,
     String? seconds,
     String? explanation,
+    String? image,
   }) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     int? index=prefs.getInt("boatNums");
     index ??= 0;
     index+=1;
     prefs.setInt("boatNums", index);
-    prefs.setString('boat$index', '$text;$selectedOption;0;$seconds;$explanation');
+    String s1 = seconds ?? "";
+    String e1 = explanation ?? "";
+    String i1 = image ?? "";
+    prefs.setString('boat$index', '$text;$selectedOption;0;$s1;$e1;$i1');
   }
   static Future<List<Race>> loadAllRaces() async
   {
