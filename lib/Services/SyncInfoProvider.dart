@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:exdata_collector/Services/LocalSaver.dart';
 
 class SyncInfoProvider {
   static final SyncInfoProvider _instance=SyncInfoProvider._internal();
@@ -9,7 +10,8 @@ class SyncInfoProvider {
   static SyncInfoProvider get instance => _instance;
   bool syncStatus=false;
   Future<void> fetchSynchronizationStatus() async {
-    final url = Uri.parse('http://yourapi.com/synchronizationstatus');
+    String baseUrl = await LocalSaver.getBackendUrl();
+    final url = Uri.parse('$baseUrl/synchronizationstatus');
 
     try {
       final response = await http.get(url);
