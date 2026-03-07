@@ -1,3 +1,4 @@
+import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:exdata_collector/Services/LocalSaver.dart';
 import 'package:flutter/material.dart';
 import '../Models/Boat.dart';
@@ -10,7 +11,7 @@ class RunItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Boat>(
-      future: LocalSaver.loadBoatData(run.boatID),
+      future: LocalDataManager.shared.load<Boat>(Boat,run.boatID),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());

@@ -1,3 +1,4 @@
+import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
 import 'Models/Boat.dart';
 import 'Models/Race.dart';
@@ -48,8 +49,8 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
   _loadItems() async {
-    List<Boat> loadedItems = await LocalSaver.loadAllBoats();
-    List<Race> loadedRaces =await LocalSaver.loadAllRaces();
+    List<Boat> loadedItems = await LocalDataManager.shared.loadAll<Boat>(Boat);
+    List<Race> loadedRaces = await LocalDataManager.shared.loadAll<Race>(Race);
     print(loadedRaces);
     setState(() {
 
@@ -75,7 +76,8 @@ class _MyHomePageState extends State<MyHomePage> {
             TextButton(
               child: Text('Delete'),
               onPressed: () {
-                LocalSaver.deleteData();
+                //TODO
+                //LocalSaver.deleteData();
                 Navigator.of(context).pop();
               },
             ),
@@ -93,7 +95,7 @@ class _MyHomePageState extends State<MyHomePage> {
     );
   }
   void  _navigateRunList(int boatID) async {
-    List<Run> runlist=await LocalSaver.loadRunData(id: boatID);
+    List<Run> runlist=await LocalDataManager.shared.loadByParam<Run>(Run,"boatID",boatID.toString());
     Navigator.of(context).push(
       MaterialPageRoute(
         builder: (context) => RunList(items: runlist,),
@@ -144,7 +146,15 @@ class _MyHomePageState extends State<MyHomePage> {
         ],
       ),
       body: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
         children: [
+          const Padding(
+            padding: EdgeInsets.all(12.0),
+            child: Text(
+              'Boats',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: _items.length,
@@ -166,7 +176,14 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
           ),
-          Divider(), // Optional: Adds a separator between the lists
+          Divider(),
+          const Padding(
+            padding: EdgeInsets.all(12.0),
+            child: Text(
+              'Races',
+              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+            ),
+          ),
           Expanded(
             child: ListView.builder(
               itemCount: races.length,
@@ -177,13 +194,13 @@ class _MyHomePageState extends State<MyHomePage> {
                   onTap: () {
                     //_navigateToNewScreen(_items[index].bID);
                   },
-
                 );
               },
             ),
           ),
         ],
       ),
+
       floatingActionButton: Column(
         mainAxisAlignment: MainAxisAlignment.end,
         children: [

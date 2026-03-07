@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:http/http.dart' as http;
 import 'package:exdata_collector/Models/Boat.dart';
 import 'package:exdata_collector/Models/Run.dart';
@@ -10,7 +11,7 @@ class OnlineSaver {
   static const String baseUrl = 'http://127.0.0.1:5000';
   static Future<void> SynchronizeRaces() async
   {
-    List<Race> races=await LocalSaver.loadAllRaces();
+    List<Race> races=await LocalDataManager.shared.loadAll<Race>(Race);
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'raceList': races.map((race) => race.toJson()).toList()});
 
@@ -38,14 +39,15 @@ class OnlineSaver {
               }
             }
           }
-          LocalSaver.updateRacesData(race:updatedRaces);
+          //TODO:update
+          //LocalSaver.updateRacesData(race:updatedRaces);
         }
 
     }
   }
   static Future<void> Synchronize() async
   {
-    List<Boat> boats=await LocalSaver.loadAllBoats();
+    List<Boat> boats=await LocalDataManager.shared.loadAll<Boat>(Boat);
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'boatList': boats.map((boat) => boat.toJson()).toList()});
 
@@ -76,7 +78,8 @@ class OnlineSaver {
       }
         SynchronizeRaces();
         SynchronizeRun(updatedBoats);
-        LocalSaver.updateBoatsData(boats:updatedBoats);
+        //TODO:update run
+        //LocalSaver.updateBoatsData(boats:updatedBoats);
 
       }
     } else {
@@ -85,8 +88,8 @@ class OnlineSaver {
   }
   static Future<void> SynchronizeRun(List<Boat> boat) async
   {
-    List<Run> runs= await LocalSaver.loadAllRunData();
-    List<Race> races= await LocalSaver.loadAllRaces();
+    List<Run> runs= await LocalDataManager.shared.loadAll<Run>(Run);
+    List<Race> races= await LocalDataManager.shared.loadAll<Race>(Race);
     List<Run> filteredRuns=[];
     for(int i=0;i<runs.length;i++)
       {
@@ -119,7 +122,8 @@ class OnlineSaver {
       final List<dynamic> responseData = jsonDecode(response.body);
       List<Run> updatedRuns = responseData.map((data) => Run.fromJson(data)).toList();
       print('Runs synchronized with updates: $updatedRuns');
-      LocalSaver.updateRunsData(runs:updatedRuns);
+      //TODO : Update run
+      //LocalSaver.updateRunsData(runs:updatedRuns);
     }
 
   }

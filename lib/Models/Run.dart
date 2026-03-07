@@ -1,4 +1,6 @@
-class Run {
+import 'package:exdata_collector/Models/AbstractModel.dart';
+
+class Run implements AbstractModel{
   int rid = 0;
   int drid= 0;
   int boatID = 0;
@@ -10,6 +12,8 @@ class Run {
   int rcid=0;
   DateTime dateTime = DateTime.now();
 
+  Run();
+
   Run.fromString(String runString) {
     var splitData = runString.split(';');
     rid = int.parse(splitData[0]);
@@ -20,8 +24,12 @@ class Run {
     directionHit = splitData[5];
     drid=int.parse(splitData[6]);
     rcid=int.parse(splitData[7]);
-    intentedPartOfGate = splitData[8] ;
-    dateTime = DateTime.parse(splitData[9]);
+    if(splitData.length > 8) {
+      intentedPartOfGate = splitData[8];
+      dateTime = DateTime.parse(splitData[9]);
+    }
+    else
+      dateTime = DateTime.now();
   }
 
   Run.fromJson(Map<String, dynamic> json)

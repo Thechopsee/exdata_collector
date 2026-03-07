@@ -1,3 +1,5 @@
+import 'package:exdata_collector/Models/Boat.dart';
+import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:exdata_collector/Services/LocalSaver.dart';
 import 'package:flutter/material.dart';
 
@@ -142,14 +144,10 @@ class _NewScreenState extends State<addNewBoatScreen> {
                     return;
                   }
                 }
-
-                // Uložit data včetně extra polí pro EX-A
-                LocalSaver.saveBoatData(
-                  text: name,
-                  selectedOption: _selectedOption.toString(),
-                  seconds: _secondsController.text,
-                  explanation: _explainController.text,
-                );
+                var boat=Boat(name:name,boatClass:_selectedOption.toString() );
+                boat.timerSeconds=_secondsController.text;
+                boat.timerExplanation=_explainController.text;
+                LocalDataManager.shared.save(boat);
 
                 print(
                     'Name: $name, Option: $_selectedOption, Seconds: ${_secondsController.text}, Explanation: ${_explainController.text}');

@@ -1,3 +1,4 @@
+import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
@@ -35,8 +36,8 @@ class _RunListState extends State<RunList> {
 
 
     for (var run in widget.items) {
-      if (!raceCache.containsKey("${run.rcid}")) {
-        raceCache["${run.rcid}"] = await LocalSaver.loadRaceData(run.rcid);
+      if (!raceCache.containsKey("${run.rcid}")){
+        raceCache["${run.rcid}"] = await LocalDataManager.shared.load<Race>(Race,run.rcid);
         tempColors["${run.rcid}"] = UIHelper.generateRandomColor();
       }
       final race = raceCache["${run.rcid}"]!;

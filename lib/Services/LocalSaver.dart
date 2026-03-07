@@ -4,7 +4,7 @@ import 'package:exdata_collector/Models/Race.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:convert';
 
-class LocalSaver {
+/*class LocalSaver {
   static void saveRunData({
     required int boatID,
     required int scope,
@@ -175,3 +175,4 @@ class LocalSaver {
 
 
 }
+*/
