@@ -1,5 +1,4 @@
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
-import 'package:exdata_collector/Services/LocalSaver.dart';
 import 'package:flutter/material.dart';
 import '../Models/Boat.dart';
 import '../Models/Run.dart';
@@ -63,7 +62,7 @@ class RunItem extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text('Intended Gate Part: ${run.intentedPartOfGate ?? '-'}'),
+                Text('Intended Gate Part: ${run.intendedPartOfGate ?? '-'}'),
                 const SizedBox(height: 6),
                 Text('Date: ${run.dateTime.toLocal()}'),
               ],

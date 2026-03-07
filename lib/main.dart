@@ -2,7 +2,6 @@ import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.
 import 'package:flutter/material.dart';
 import 'Models/Boat.dart';
 import 'Models/Race.dart';
-import 'Services/LocalSaver.dart';
 import 'Services/OnlineSaver.dart';
 import 'addNewBoatScreen.dart';
 import 'addNewScoreScreen.dart';
@@ -76,8 +75,8 @@ class _MyHomePageState extends State<MyHomePage> {
             TextButton(
               child: Text('Delete'),
               onPressed: () {
-                //TODO
-                //LocalSaver.deleteData();
+                LocalDataManager.shared.deleteAll();
+                _loadItems();
                 Navigator.of(context).pop();
               },
             ),

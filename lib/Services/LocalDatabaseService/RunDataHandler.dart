@@ -1,27 +1,31 @@
 import 'package:exdata_collector/Services/LocalDatabaseService/BaseDataHandler.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:exdata_collector/Models/Run.dart';
-import 'IDataHandler.dart';
 
 class RunDataHandler extends BaseDataHandler {
   @override
   bool canHandle(Type model) => model == Run;
 
   @override
-  bool canHandleType(Type type) => type == Run;
-
-  @override
   Future<void> save(Object model) async {
     final prefs = await SharedPreferences.getInstance();
     Run run = model as Run;
-    int? index = prefs.getInt("runNums") ?? 0;
-    index++;
-    prefs.setInt("runNums", index);
+
+    int index;
+    if (run.rid > 0) {
+      index = run.rid;
+    } else {
+      int lastIndex = prefs.getInt("runNums") ?? 0;
+      index = lastIndex + 1;
+      prefs.setInt("runNums", index);
+      run.rid = index;
+    }
 
     String data = "$index;${run.boatID};${run.scopeTo};${run.directionTo};"
-        "${run.hit};${run.directionHit};${run.drid};${run.rcid}";
+        "${run.hit};${run.directionHit};${run.drid};${run.rcid};"
+        "${run.intendedPartOfGate ?? ""};${run.dateTime.toIso8601String()}";
 
-    prefs.setString('run$index', data);
+    await prefs.setString('run$index', data);
   }
 
   @override
@@ -48,6 +52,18 @@ class RunDataHandler extends BaseDataHandler {
       Run run = Run.fromString(data);
       return run;
     }
-    return false;
+    return null;
+  }
+
+  @override
+  Future<void> deleteAll() async {
+    final prefs = await SharedPreferences.getInstance();
+    int? index = prefs.getInt("runNums");
+    if (index != null) {
+      for (int i = 1; i <= index; i++) {
+        await prefs.remove('run$i');
+      }
+      await prefs.setInt("runNums", 0);
+    }
   }
 }

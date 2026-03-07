@@ -5,6 +5,7 @@ abstract class IDataHandler {
   Future<void> save(Object model);
   Future<Object?> load(int id);
   Future<List<Object>> loadAll();
+  Future<void> deleteAll();
   Future<List<Object>> loadByParam<T>(String paramName,T value)
   async {
     List<AbstractModel> objects = (await loadAll()).whereType<AbstractModel>().toList();
