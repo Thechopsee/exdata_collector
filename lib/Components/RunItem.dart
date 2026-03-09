@@ -1,4 +1,4 @@
-import 'package:exdata_collector/Services/LocalSaver.dart';
+import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
 import '../Models/Boat.dart';
 import '../Models/Run.dart';
@@ -10,7 +10,7 @@ class RunItem extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return FutureBuilder<Boat>(
-      future: LocalSaver.loadBoatData(run.boatID),
+      future: LocalDataManager.shared.load<Boat>(Boat,run.boatID),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
@@ -62,7 +62,7 @@ class RunItem extends StatelessWidget {
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text('Intended Gate Part: ${run.intentedPartOfGate ?? '-'}'),
+                Text('Intended Gate Part: ${run.intendedPartOfGate ?? '-'}'),
                 const SizedBox(height: 6),
                 Text('Date: ${run.dateTime.toLocal()}'),
               ],

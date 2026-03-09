@@ -1,4 +1,6 @@
-class Race {
+import 'package:exdata_collector/Models/AbstractModel.dart';
+
+class Race implements AbstractModel{
   String name;
   DateTime date;
   int rcid;

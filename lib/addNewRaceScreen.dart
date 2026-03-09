@@ -1,4 +1,4 @@
-import 'package:exdata_collector/Services/LocalSaver.dart';
+import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
 import 'Models/Race.dart';
 import 'package:intl/intl.dart';
@@ -19,7 +19,7 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
     super.dispose();
   }
 
-  void _submitForm() {
+  void _submitForm() async{
     if (_formKey.currentState!.validate()) {
       Race newRace = Race(
         name: _nameController.text,
@@ -27,7 +27,7 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
         rcid: 0,
         drcid: 0,
       );
-      LocalSaver.saveRaceData(race: newRace);
+      await LocalDataManager.shared.save(newRace);
       Navigator.pop(context);
     }
   }

@@ -1,5 +1,6 @@
+import 'package:exdata_collector/Models/Run.dart';
+import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
-import 'Services/LocalSaver.dart';
 import 'Models/Boat.dart';
 import 'Models/Race.dart';
 
@@ -52,8 +53,8 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
   }
   void loadOptions ()async
   {
-    boatOptions=await LocalSaver.loadAllBoats();
-    races=await LocalSaver.loadAllRaces();
+    boatOptions=await LocalDataManager.shared.loadAll<Boat>(Boat);
+    races=await LocalDataManager.shared.loadAll<Race>(Race);
     for(int i=0;i<races.length;i++)
       {
         _racesC.add("${races[i].rcid} ${races[i].name} ${races[i].date.year}");
@@ -118,231 +119,149 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add new Record'),
+        title: const Text('Add New Record'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Intended Score:',
-              style: TextStyle(fontSize: 18),
-            ),
-            TextField(
-              controller: _textEditingController,
-              decoration: const InputDecoration(
-                hintText: 'Score',
+      body: SafeArea(
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Intended Score
+              _buildLabel('Intended Score:'),
+              TextField(
+                controller: _textEditingController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: 'Score',
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Intended Direction:',
-              style: TextStyle(fontSize: 18),
-            ),
-            Row(
-              children: [
-                Radio<String>(
-                  value: 'L',
-                  groupValue: _selectedOption,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedOption = value;
-                    });
-                  },
-                ),
-                const Text('L'),
-                Radio<String>(
-                  value: 'S',
-                  groupValue: _selectedOption,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedOption = value;
-                    });
-                  },
-                ),
-                const Text('S'),
-                Radio<String>(
-                  value: 'P',
-                  groupValue: _selectedOption,
-                  onChanged: (value) {
-                    setState(() {
-                      _selectedOption = value;
-                    });
-                  },
-                ),
-                const Text('P'),
-              ],
-            ),
-            const Text(
-              'In with part of gate:',
-              style: TextStyle(fontSize: 18),
-            ),
-            Row(
-              children: [
-                Radio<String>(
-                  value: 'L',
-                  groupValue: _gatePartSelected,
-                  onChanged: (value) {
-                    setState(() {
-                      _gatePartSelected = value;
-                    });
-                  },
-                ),
-                const Text('L'),
-                Radio<String>(
-                  value: 'S',
-                  groupValue: _gatePartSelected,
-                  onChanged: (value) {
-                    setState(() {
-                      _gatePartSelected = value;
-                    });
-                  },
-                ),
-                const Text('S'),
-                Radio<String>(
-                  value: 'P',
-                  groupValue: _gatePartSelected,
-                  onChanged: (value) {
-                    setState(() {
-                      _gatePartSelected = value;
-                    });
-                  },
-                ),
-                const Text('P'),
-              ],
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Gained Score:',
-              style: TextStyle(fontSize: 18),
-            ),
-            TextField(
-              controller: _secondTextEditingController,
-              decoration: const InputDecoration(
-                hintText: 'Score:',
-              ),
-            ),
-            const SizedBox(height: 20),
-            const Text(
-              'Hit Direction:',
-              style: TextStyle(fontSize: 18),
-            ),
-            Row(
-              children: [
-                Radio<String>(
-                  value: 'L',
-                  groupValue: _secondSelectedOption,
-                  onChanged: (value) {
-                    setState(() {
-                      _secondSelectedOption = value;
-                    });
-                  },
-                ),
-                const Text('L'),
-                Radio<String>(
-                  value: 'S',
-                  groupValue: _secondSelectedOption,
-                  onChanged: (value) {
-                    setState(() {
-                      _secondSelectedOption = value;
-                    });
-                  },
-                ),
-                const Text('S'),
-                Radio<String>(
-                  value: 'P',
-                  groupValue: _secondSelectedOption,
-                  onChanged: (value) {
-                    setState(() {
-                      _secondSelectedOption = value;
-                    });
-                  },
-                ),
-                const Text('P'),
-              ],
-            ),
-            const SizedBox(height: 20),
-            Visibility(
-              visible: showCombo,
-              child:
-            const Text(
-              'Boat:',
-              style: TextStyle(fontSize: 18),
-            ),
-            ),
-            Visibility(
-              visible: showCombo,
-              child:
-            DropdownButton<String>(
+              const SizedBox(height: 20),
 
-              value: _boatSelection,
-              onChanged: (String? newValue) {
-                setState(() {
-                  _boatSelection = newValue;
-                });
-              },
-              items:  _boatOptionsC.map<DropdownMenuItem<String>>((String value) {
-                return DropdownMenuItem<String>(
-                  value: value,
-                  child: Text(value),
-                );
-              }).toList(),
-            ),
-            ),
-            Visibility(
-              visible: showCombo,
-              child:
-              const Text(
-                'Race:',
-                style: TextStyle(fontSize: 18),
-              ),
-            ),
-            Visibility(
-              visible: true,
-              child:
-              DropdownButton<String>(
+              // Intended Direction
+              _buildLabel('Intended Direction:'),
+              _buildRadioGroup(_selectedOption, (val) {
+                setState(() => _selectedOption = val);
+              }),
 
-                value: _raceSelection,
-                onChanged: (String? newValue) {
-                  setState(() {
-                    _raceSelection = newValue;
-                  });
-                },
-                items:  _racesC.map<DropdownMenuItem<String>>((String value) {
-                  return DropdownMenuItem<String>(
-                    value: value,
-                    child: Text(value),
-                  );
-                }).toList(),
+              const SizedBox(height: 20),
+
+              // Gate Part
+              _buildLabel('In with part of gate:'),
+              _buildRadioGroup(_gatePartSelected, (val) {
+                setState(() => _gatePartSelected = val);
+              }),
+
+              const SizedBox(height: 20),
+
+              // Gained Score
+              _buildLabel('Gained Score:'),
+              TextField(
+                controller: _secondTextEditingController,
+                keyboardType: TextInputType.number,
+                decoration: const InputDecoration(
+                  hintText: 'Score',
+                  border: OutlineInputBorder(),
+                ),
               ),
-            ),
-            const SizedBox(height: 20),
-            Center(
-              child: ElevatedButton(
-                onPressed: () {
-                  if(showCombo) {
-                    boatID = int.parse(_boatSelection.toString().split(" ")[0]);
-                  }
-                  int raceid = int.parse(_raceSelection.toString().split(" ")[0]);
-                  print(boatID);
-                  LocalSaver.saveRunData(
-                      boatID: boatID,
-                      scope: int.parse(_textEditingController.text.toString()),
-                      hit: int.parse(_secondTextEditingController.text.toString()),
-                      scopeToo: _selectedOption.toString(),
-                      directionTOO: _secondSelectedOption.toString(),
-                      rcid:raceid,
-                      intentedPartOfGate: _gatePartSelected.toString(),
-                  );
-                  Navigator.pop(context);
-                },
-                child: const Text('Save'),
+
+              const SizedBox(height: 20),
+
+              // Hit Direction
+              _buildLabel('Hit Direction:'),
+              _buildRadioGroup(_secondSelectedOption, (val) {
+                setState(() => _secondSelectedOption = val);
+              }),
+
+              const SizedBox(height: 20),
+
+              if (showCombo) ...[
+                _buildLabel('Boat:'),
+                _buildDropdown(_boatSelection, _boatOptionsC, (val) {
+                  setState(() => _boatSelection = val);
+                }),
+                const SizedBox(height: 20),
+              ],
+
+              _buildLabel('Race:'),
+              _buildDropdown(_raceSelection, _racesC, (val) {
+                setState(() => _raceSelection = val);
+              }),
+
+              const SizedBox(height: 30),
+
+              Center(
+                child: ElevatedButton(
+                  onPressed: _handleSubmit,
+                  child: const Text('Save'),
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );
   }
+
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+    );
+  }
+
+  void _handleSubmit() {
+    if (showCombo) {
+      boatID = int.parse(_boatSelection!.split(" ")[0]);
+    }
+
+    int raceID = int.parse(_raceSelection!.split(" ")[0]);
+
+    var run = Run()
+      ..boatID = boatID
+      ..rcid = raceID
+      ..scopeTo = int.tryParse(_textEditingController.text) ?? 0
+      ..hit = int.tryParse(_secondTextEditingController.text) ?? 0
+      ..directionTo = _selectedOption ?? ''
+      ..directionHit = _secondSelectedOption ?? ''
+      ..intendedPartOfGate = _gatePartSelected ?? '';
+
+    LocalDataManager.shared.save(run);
+    Navigator.pop(context);
+  }
+
+
+  Widget _buildRadioGroup(String? selectedValue, ValueChanged<String?> onChanged) {
+    return Row(
+      children: ['L', 'S', 'P'].map((option) {
+        return Row(
+          children: [
+            Radio<String>(
+              value: option,
+              groupValue: selectedValue,
+              onChanged: onChanged,
+            ),
+            Text(option),
+          ],
+        );
+      }).toList(),
+    );
+  }
+
+  Widget _buildDropdown(String? value, List<String> items, ValueChanged<String?> onChanged) {
+    return DropdownButton<String>(
+      isExpanded: true,
+      value: value,
+      onChanged: onChanged,
+      items: items.map((val) {
+        return DropdownMenuItem(
+          value: val,
+          child: Text(val),
+        );
+      }).toList(),
+    );
+  }
+
+
 }

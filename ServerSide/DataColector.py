@@ -24,8 +24,8 @@ class Run(db.Model):
     directionTo = db.Column(db.String)
     hit = db.Column(db.Integer)
     hitDirection = db.Column(db.String)
-    intentedPartOfGate = db.Column(db.String)
-    dateTime = db.Column(db.DateTime)
+    intendedPartOfGate = db.Column(db.String)
+    dateTime = db.Column(db.DateTime, default=datetime.utcnow)
 
 class Race(db.Model):
     rcid = db.Column(db.Integer, primary_key=True, autoincrement=True)
@@ -40,33 +40,37 @@ class Race(db.Model):
             'drcid': self.rcid,
         }
 
-    @staticmethod
-    def from_json(json_data):
-        return Race(
-            name=json_data.get('name'),
-            date=datetime.datetime.fromisoformat(json_data.get('date')) if json_data.get('date') else None
-        )
-
 @app.route('/boats/sync', methods=['POST'])
 def check_sync_boat():
     data = request.get_json()
     idlist = data['boatList']
     isUnsync=False
     for x in idlist:
-        if(x['dbID']<1):
-            print(x)
-            new_boat = Boat(name=x['name'], boatClass=x['boatClass'], timerSeconds=x.get('timerSeconds'), timerExplanation=x.get('timerExplanation'))
+        if(x.get('dbID', 0) < 1):
+            new_boat = Boat(
+                name=x['name'],
+                boatClass=x['boatClass'],
+                timerSeconds=x.get('timerSeconds'),
+                timerExplanation=x.get('timerExplanation')
+            )
             db.session.add(new_boat)
             db.session.commit()
             isUnsync=True
     boats = Boat.query.all()
-    boatArray=[{'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation} for boat in boats]
+    boatArray=[{
+        'bID': boat.bID,
+        'dbID': boat.bID,
+        'name': boat.name,
+        'boatClass': boat.boatClass,
+        'timerSeconds': boat.timerSeconds,
+        'timerExplanation': boat.timerExplanation
+    } for boat in boats]
+
     if(len(boatArray)!=len(idlist)):
         isUnsync=True
     if(isUnsync):
         return jsonify(boatArray)  
     else:
-        print("ok")
         return jsonify([]),200
               
 @app.route('/runs/sync', methods=['POST'])
@@ -75,15 +79,34 @@ def check_sync_run():
     idlist = data['runList']
     isUnsync=False
     for x in idlist:
-        if(x['drid']==0):
-            print(x)
-            dt = datetime.datetime.fromisoformat(x['dateTime']) if x.get('dateTime') else None
-            new_run=Run(boatID=x['boatID'],scopeTo=x['scopeToo'],directionTo=x['directionToo'],hit=x['hit'],hitDirection=x['directionHit'],rcid=x['rcid'], intentedPartOfGate=x.get('intentedPartOfGate'), dateTime=dt)
+        if(x.get('drid', 0) == 0):
+            dt = datetime.fromisoformat(x['dateTime']) if x.get('dateTime') else datetime.utcnow()
+            new_run=Run(
+                boatID=x['boatID'],
+                scopeTo=x.get('scopeTo'),
+                directionTo=x.get('directionTo'),
+                hit=x.get('hit'),
+                hitDirection=x.get('directionHit'),
+                rcid=x['rcid'],
+                intendedPartOfGate=x.get('intendedPartOfGate'),
+                dateTime=dt
+            )
             db.session.add(new_run)
             db.session.commit()
             isUnsync=True
     runs = Run.query.all()
-    runsArray=[{'rid': run.rid,'drid':run.rid, 'boatID': run.boatID, 'scopeToo': run.scopeTo,'directionToo':run.directionTo,'hit':run.hit,'directionHit':run.hitDirection,'rcid':run.rcid, 'intentedPartOfGate': run.intentedPartOfGate, 'dateTime': run.dateTime.isoformat() if run.dateTime else None} for run in runs]
+    runsArray=[{
+        'rid': run.rid,
+        'drid': run.rid,
+        'boatID': run.boatID,
+        'scopeTo': run.scopeTo,
+        'directionTo': run.directionTo,
+        'hit': run.hit,
+        'directionHit': run.hitDirection,
+        'rcid': run.rcid,
+        'intendedPartOfGate': run.intendedPartOfGate,
+        'dateTime': run.dateTime.isoformat()
+    } for run in runs]
     return jsonify(runsArray),200
 
 @app.route('/races/sync', methods=['POST'])
@@ -91,13 +114,11 @@ def check_sync_race():
     data = request.get_json()
     idlist = data['raceList']
     isUnsync=False
-    print(idlist)
     for x in idlist:
-        if(x['drcid']==0):
-            print(x)
-            date_object = datetime.datetime.fromisoformat(x["date"])
-            new_run=Race(name=x["name"],date=date_object)
-            db.session.add(new_run)
+        if(x.get('drcid', 0) == 0):
+            date_object = datetime.fromisoformat(x["date"])
+            new_race=Race(name=x["name"], date=date_object)
+            db.session.add(new_race)
             db.session.commit()
             isUnsync=True
     races = Race.query.all()
@@ -107,7 +128,12 @@ def check_sync_race():
 @app.route('/boats', methods=['POST'])
 def create_boat():
     data = request.get_json()
-    new_boat = Boat(name=data['name'], boatClass=data['boatClass'], timerSeconds=data.get('timerSeconds'), timerExplanation=data.get('timerExplanation'))
+    new_boat = Boat(
+        name=data['name'],
+        boatClass=data['boatClass'],
+        timerSeconds=data.get('timerSeconds'),
+        timerExplanation=data.get('timerExplanation')
+    )
     db.session.add(new_boat)
     db.session.commit()
     return jsonify({'message': 'Boat created'}), 201
@@ -115,12 +141,24 @@ def create_boat():
 @app.route('/boats', methods=['GET'])
 def get_boats():
     boats = Boat.query.all()
-    return jsonify([{'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation} for boat in boats])
+    return jsonify([{
+        'bID': boat.bID,
+        'name': boat.name,
+        'boatClass': boat.boatClass,
+        'timerSeconds': boat.timerSeconds,
+        'timerExplanation': boat.timerExplanation
+    } for boat in boats])
 
 @app.route('/boats/<int:id>', methods=['GET'])
 def get_boat(id):
     boat = Boat.query.get_or_404(id)
-    return jsonify({'bID': boat.bID, 'name': boat.name, 'boatClass': boat.boatClass, 'timerSeconds': boat.timerSeconds, 'timerExplanation': boat.timerExplanation})
+    return jsonify({
+        'bID': boat.bID,
+        'name': boat.name,
+        'boatClass': boat.boatClass,
+        'timerSeconds': boat.timerSeconds,
+        'timerExplanation': boat.timerExplanation
+    })
 
 @app.route('/boats/<int:id>', methods=['PUT'])
 def update_boat(id):
@@ -144,15 +182,15 @@ def delete_boat(id):
 @app.route('/runs', methods=['POST'])
 def create_run():
     data = request.get_json()
-    dt = datetime.datetime.fromisoformat(data['dateTime']) if data.get('dateTime') else None
+    dt = datetime.fromisoformat(data['dateTime']) if data.get('dateTime') else datetime.utcnow()
     new_run = Run(
         boatID=data['boatID'],
         rcid=data['rcid'],
         scopeTo=data.get('scopeTo'),
         directionTo=data.get('directionTo'),
         hit=data.get('hit'),
-        hitDirection=data.get('hitDirection'),
-        intentedPartOfGate=data.get('intentedPartOfGate'),
+        hitDirection=data.get('directionHit'),
+        intendedPartOfGate=data.get('intendedPartOfGate'),
         dateTime=dt
     )
     db.session.add(new_run)
@@ -169,9 +207,9 @@ def get_runs():
         'scopeTo': run.scopeTo,
         'directionTo': run.directionTo,
         'hit': run.hit,
-        'hitDirection': run.hitDirection,
-        'intentedPartOfGate': run.intentedPartOfGate,
-        'dateTime': run.dateTime.isoformat() if run.dateTime else None
+        'directionHit': run.hitDirection,
+        'intendedPartOfGate': run.intendedPartOfGate,
+        'dateTime': run.dateTime.isoformat()
     } for run in runs])
 
 @app.route('/runs/<int:id>', methods=['GET'])
@@ -184,9 +222,9 @@ def get_run(id):
         'scopeTo': run.scopeTo,
         'directionTo': run.directionTo,
         'hit': run.hit,
-        'hitDirection': run.hitDirection,
-        'intentedPartOfGate': run.intentedPartOfGate,
-        'dateTime': run.dateTime.isoformat() if run.dateTime else None
+        'directionHit': run.hitDirection,
+        'intendedPartOfGate': run.intendedPartOfGate,
+        'dateTime': run.dateTime.isoformat()
     })
 
 @app.route('/runs/<int:id>', methods=['PUT'])
@@ -198,10 +236,10 @@ def update_run(id):
     run.scopeTo = data.get('scopeTo')
     run.directionTo = data.get('directionTo')
     run.hit = data.get('hit')
-    run.hitDirection = data.get('hitDirection')
-    run.intentedPartOfGate = data.get('intentedPartOfGate')
+    run.hitDirection = data.get('directionHit')
+    run.intendedPartOfGate = data.get('intendedPartOfGate')
     if data.get('dateTime'):
-        run.dateTime = datetime.datetime.fromisoformat(data['dateTime'])
+        run.dateTime = datetime.fromisoformat(data['dateTime'])
     db.session.commit()
     return jsonify({'message': 'Run updated'})
 
@@ -211,15 +249,20 @@ def delete_run(id):
     db.session.delete(run)
     db.session.commit()
     return jsonify({'message': 'Run deleted'})
+
 @app.route('/', methods=['GET'])
 def de():
     db.create_all()
-    return jsonify({'message': 'Run deleted'})
+    return jsonify({'message': 'Database created/updated'})
 
 # Create a new Race
 @app.route('/races', methods=['POST'])
 def create_race():
-    new_race = Race.from_json(request.json)
+    data = request.get_json()
+    new_race = Race(
+        name=data['name'],
+        date=datetime.fromisoformat(data['date'])
+    )
     db.session.add(new_race)
     db.session.commit()
     return jsonify(new_race.to_json()), 201
@@ -240,9 +283,7 @@ def update_race(id):
     if 'name' in request.json:
         race.name = request.json['name']
     if 'date' in request.json:
-        race.date = datetime.datetime.fromisoformat(request.json['date'])
-    if 'rcid' in request.json:
-        race.rcid = request.json['rcid']
+        race.date = datetime.fromisoformat(request.json['date'])
     db.session.commit()
     return jsonify(race.to_json())
 
