@@ -1,6 +1,6 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'package:exdata_collector/Services/LocalSaver.dart';
+//import 'package:exdata_collector/Services/LocalSaver.dart';
 
 class SyncInfoProvider {
   static final SyncInfoProvider _instance=SyncInfoProvider._internal();
@@ -10,7 +10,7 @@ class SyncInfoProvider {
   static SyncInfoProvider get instance => _instance;
   bool syncStatus=false;
   Future<void> fetchSynchronizationStatus() async {
-    String baseUrl = await LocalSaver.getBackendUrl();
+    /*String baseUrl = await LocalSaver.getBackendUrl();
     final url = Uri.parse('$baseUrl/synchronizationstatus');
 
     try {
@@ -26,6 +26,6 @@ class SyncInfoProvider {
       }
     } catch (e) {
       print('Error: $e');
-    }
+    }*/
   }
 }

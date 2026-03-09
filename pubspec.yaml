@@ -33,7 +33,6 @@ dependencies:
   shared_preferences: ^2.0.8
   intl: ^0.17.0
   http: ^1.2.1
-  background_remover: ^0.0.3
   path_provider: ^2.1.2
   image_picker: ^1.0.4
 
