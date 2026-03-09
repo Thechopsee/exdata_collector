@@ -8,6 +8,7 @@ import 'addNewScoreScreen.dart';
 import 'addNewRaceScreen.dart';
 import 'runList.dart';
 import "Models/Run.dart";
+import 'settingsScreen.dart';
 
 void main() {
   runApp(const MyApp());
@@ -120,6 +121,13 @@ class _MyHomePageState extends State<MyHomePage> {
   }
 
 
+  void _navigateToSettings() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => const SettingsScreen(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -132,9 +140,15 @@ class _MyHomePageState extends State<MyHomePage> {
             onSelected: (String result) {
               if (result == 'delete') {
                 _deleteData();
+              } else if (result == 'settings') {
+                _navigateToSettings();
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
+              const PopupMenuItem<String>(
+                value: 'settings',
+                child: Text('Settings'),
+              ),
               const PopupMenuItem<String>(
                 value: 'delete',
                 child: Text('Delete Data'),
