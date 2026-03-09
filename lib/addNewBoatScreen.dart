@@ -1,6 +1,5 @@
 import 'package:exdata_collector/Models/Boat.dart';
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
-import 'package:exdata_collector/Services/LocalSaver.dart';
 import 'package:flutter/material.dart';
 
 class addNewBoatScreen extends StatefulWidget {

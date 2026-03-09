@@ -51,4 +51,10 @@ class LocalDataManager {
     }
     throw Exception("No handler found for $modelType");
   }
+
+  Future<void> deleteAll() async {
+    for (var handler in _handlers) {
+      await handler.deleteAll();
+    }
+  }
 }

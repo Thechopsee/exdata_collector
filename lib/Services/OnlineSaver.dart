@@ -5,157 +5,145 @@ import 'package:exdata_collector/Models/Boat.dart';
 import 'package:exdata_collector/Models/Run.dart';
 import 'package:exdata_collector/Models/Race.dart';
 
-import 'package:exdata_collector/Services/LocalSaver.dart';
-
 class OnlineSaver {
   static const String baseUrl = 'http://127.0.0.1:5000';
-  static Future<void> SynchronizeRaces() async
-  {
-    List<Race> races=await LocalDataManager.shared.loadAll<Race>(Race);
+
+  static Future<void> SynchronizeRaces() async {
+    List<Race> races = await LocalDataManager.shared.loadAll<Race>(Race);
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'raceList': races.map((race) => race.toJson()).toList()});
 
-    final response = await http.post(Uri.parse(baseUrl+"/races/sync"), headers: headers, body: body);
+    final response = await http.post(Uri.parse(baseUrl + "/races/sync"), headers: headers, body: body);
     if (response.statusCode == 200) {
       print('Races synchronized successfully');
       final List<dynamic> responseData = jsonDecode(response.body);
-      if (responseData.isEmpty) {
-        print('Races are synchronized, no changes.');
-      }
-      else
-        {
-          List<Race> updatedRaces = responseData.map((data) => Race.fromJson(data)).toList();
-          print('Boats synchronized with updates: $updatedRaces');
-          for (int i = 0; i < updatedRaces.length; i++)
-          {
-            updatedRaces[i].drcid=updatedRaces[i].rcid;
-          }
-          for(int i=0;i<races.length;i++)
-          {
-            for(int j=0;j<updatedRaces.length;j++) {
-              if (races[i].name==updatedRaces[j].name && races[i].date==updatedRaces[j].date)
-              {
-                updatedRaces[j].rcid=races[i].rcid;
-              }
+      if (responseData.isNotEmpty) {
+        List<Race> updatedRaces = responseData.map((data) => Race.fromJson(data)).toList();
+        print('Races synchronized with updates: $updatedRaces');
+
+        for (var updatedRace in updatedRaces) {
+          updatedRace.drcid = updatedRace.rcid;
+          // Find local rcid by matching name and date
+          for (var localRace in races) {
+            if (localRace.name == updatedRace.name &&
+                localRace.date.toIso8601String() == updatedRace.date.toIso8601String()) {
+              updatedRace.rcid = localRace.rcid;
+              break;
             }
           }
-          //TODO:update
-          //LocalSaver.updateRacesData(race:updatedRaces);
+          await LocalDataManager.shared.save(updatedRace);
         }
-
+      }
     }
   }
-  static Future<void> Synchronize() async
-  {
-    List<Boat> boats=await LocalDataManager.shared.loadAll<Boat>(Boat);
+
+  static Future<void> Synchronize() async {
+    List<Boat> boats = await LocalDataManager.shared.loadAll<Boat>(Boat);
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'boatList': boats.map((boat) => boat.toJson()).toList()});
 
-    final response = await http.post(Uri.parse(baseUrl+"/boats/sync"), headers: headers, body: body);
+    final response = await http.post(Uri.parse(baseUrl + "/boats/sync"), headers: headers, body: body);
 
     if (response.statusCode == 200) {
-    print('Boats synchronized successfully');
-    final List<dynamic> responseData = jsonDecode(response.body);
-      if (responseData.isEmpty) {
-      print('Boats are synchronized, no changes.');
-      SynchronizeRaces();
-      SynchronizeRun(boats);
-      } else {
-      List<Boat> updatedBoats = responseData.map((data) => Boat.fromJson(data)).toList();
-      print('Boats synchronized with updates: $updatedBoats');
-      for (int i = 0; i < updatedBoats.length; i++)
-        {
-          updatedBoats[i].dbID=updatedBoats[i].bID;
-        }
-      for(int i=0;i<boats.length;i++)
-      {
-        for(int j=0;j<updatedBoats.length;j++) {
-          if (boats[i].boatClass==updatedBoats[j].boatClass && boats[i].name==updatedBoats[j].name)
-            {
-              updatedBoats[j].bID=boats[i].bID;
-            }
-        }
-      }
-        SynchronizeRaces();
-        SynchronizeRun(updatedBoats);
-        //TODO:update run
-        //LocalSaver.updateBoatsData(boats:updatedBoats);
+      print('Boats synchronized successfully');
+      final List<dynamic> responseData = jsonDecode(response.body);
+      List<Boat> finalBoats = boats;
+      if (responseData.isNotEmpty) {
+        List<Boat> updatedBoatsFromServer = responseData.map((data) => Boat.fromJson(data)).toList();
+        print('Boats synchronized with updates: $updatedBoatsFromServer');
 
+        for (var updatedBoat in updatedBoatsFromServer) {
+          // Find local bID by matching name and boatClass
+          for (var localBoat in boats) {
+            if (localBoat.name == updatedBoat.name && localBoat.boatClass == updatedBoat.boatClass) {
+              updatedBoat.bID = localBoat.bID;
+              break;
+            }
+          }
+          await LocalDataManager.shared.save(updatedBoat);
+        }
+        finalBoats = await LocalDataManager.shared.loadAll<Boat>(Boat);
       }
+      await SynchronizeRaces();
+      await SynchronizeRun(finalBoats);
     } else {
-    print('Failed to synchronize boats: ${response.statusCode}');
+      print('Failed to synchronize boats: ${response.statusCode}');
+    }
   }
-  }
-  static Future<void> SynchronizeRun(List<Boat> boat) async
-  {
-    List<Run> runs= await LocalDataManager.shared.loadAll<Run>(Run);
-    List<Race> races= await LocalDataManager.shared.loadAll<Race>(Race);
-    List<Run> filteredRuns=[];
-    for(int i=0;i<runs.length;i++)
-      {
-        bool f=false;
-        for(int j=0;j<boat.length;j++) {
-          if (runs[i].boatID == boat[j].bID) {
-            runs[i].boatID=boat[j].dbID;
-            f=true;
+
+  static Future<void> SynchronizeRun(List<Boat> currentBoats) async {
+    List<Run> runs = await LocalDataManager.shared.loadAll<Run>(Run);
+    List<Race> races = await LocalDataManager.shared.loadAll<Race>(Race);
+    List<Run> filteredRuns = [];
+
+    for (var run in runs) {
+      bool boatFound = false;
+      for (var boat in currentBoats) {
+        if (run.boatID == boat.bID) {
+          run.boatID = boat.dbID;
+          boatFound = true;
+          break;
         }
       }
-        for(int j=0;j<races.length;j++)
-          {
-            if (runs[i].rcid == races[j].rcid)
-              {
-                runs[i].rcid==races[j].drcid;
-                f=true;
-              }
-          }
-        if(f)
-          {
-            filteredRuns.add(runs[i]);
-          }
+
+      bool raceFound = false;
+      for (var race in races) {
+        if (run.rcid == race.rcid) {
+          run.rcid = race.drcid;
+          raceFound = true;
+          break;
+        }
       }
+
+      if (boatFound && raceFound) {
+        filteredRuns.add(run);
+      }
+    }
 
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'runList': filteredRuns.map((run) => run.toJson()).toList()});
-    final response = await http.post(Uri.parse(baseUrl+"/runs/sync"), headers: headers, body: body);
+    final response = await http.post(Uri.parse(baseUrl + "/runs/sync"), headers: headers, body: body);
 
     if (response.statusCode == 200) {
       final List<dynamic> responseData = jsonDecode(response.body);
       List<Run> updatedRuns = responseData.map((data) => Run.fromJson(data)).toList();
       print('Runs synchronized with updates: $updatedRuns');
-      //TODO : Update run
-      //LocalSaver.updateRunsData(runs:updatedRuns);
-    }
 
+      for (var updatedRun in updatedRuns) {
+        // Re-loading original runs to get local IDs
+        List<Run> localRuns = await LocalDataManager.shared.loadAll<Run>(Run);
+        for(var localRun in localRuns) {
+           // We can match by dateTime and boatID (original local)
+           if (localRun.dateTime.toIso8601String() == updatedRun.dateTime.toIso8601String()) {
+             updatedRun.rid = localRun.rid;
+             updatedRun.boatID = localRun.boatID;
+             updatedRun.rcid = localRun.rcid;
+             break;
+           }
+        }
+
+        await LocalDataManager.shared.save(updatedRun);
+      }
+    }
   }
-  static Future<void> SynchronizeFromServer() async
-  {
-    //load data from server
-    //save them local
-  }
-  static Future<void> SynchronizeToServer() async
-  {
-    //save unsync data to server
-  }
-  static Future<void> saveRunData({
-    required Run run,
-  }) async {
-    final url = Uri.parse('$baseUrl/saveRunData');
+
+  static Future<void> saveRunData({required Run run}) async {
+    final url = Uri.parse('$baseUrl/runs');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: run.toJson(),
+      body: jsonEncode(run.toJson()),
     );
 
-    if (response.statusCode == 200) {
+    if (response.statusCode == 201) {
       print('Run data saved successfully');
     } else {
       print('Failed to save run data: ${response.statusCode}');
     }
   }
 
-  // Načtení všech dat jízdy (Run) z serveru
   static Future<List<Run>> loadAllRunData() async {
-    final url = Uri.parse('$baseUrl/loadAllRunData');
+    final url = Uri.parse('$baseUrl/runs');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -167,14 +155,12 @@ class OnlineSaver {
     }
   }
 
-  static Future<void> saveBoatData({
-    required Boat boat,
-  }) async {
+  static Future<void> saveBoatData({required Boat boat}) async {
     final url = Uri.parse('$baseUrl/boats');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body:  json.encode(boat.toJson()),
+      body: jsonEncode(boat.toJson()),
     );
 
     if (response.statusCode == 201) {
@@ -185,7 +171,7 @@ class OnlineSaver {
   }
 
   static Future<List<Boat>> loadAllBoats() async {
-    final url = Uri.parse('$baseUrl/loadAllBoats');
+    final url = Uri.parse('$baseUrl/boats');
     final response = await http.get(url);
 
     if (response.statusCode == 200) {
@@ -196,14 +182,13 @@ class OnlineSaver {
       return [];
     }
   }
-  static Future<void> saveRaceData({
-    required Race race,
-  }) async {
+
+  static Future<void> saveRaceData({required Race race}) async {
     final url = Uri.parse('$baseUrl/races');
     final response = await http.post(
       url,
       headers: {'Content-Type': 'application/json'},
-      body: json.encode(race.toJson()),
+      body: jsonEncode(race.toJson()),
     );
 
     if (response.statusCode == 201) {

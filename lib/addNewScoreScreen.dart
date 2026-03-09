@@ -1,7 +1,6 @@
 import 'package:exdata_collector/Models/Run.dart';
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
-import 'Services/LocalSaver.dart';
 import 'Models/Boat.dart';
 import 'Models/Race.dart';
 
@@ -226,7 +225,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
       ..hit = int.tryParse(_secondTextEditingController.text) ?? 0
       ..directionTo = _selectedOption ?? ''
       ..directionHit = _secondSelectedOption ?? ''
-      ..intentedPartOfGate = _gatePartSelected ?? '';
+      ..intendedPartOfGate = _gatePartSelected ?? '';
 
     LocalDataManager.shared.save(run);
     Navigator.pop(context);
