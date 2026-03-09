@@ -9,6 +9,7 @@ import 'addNewRaceScreen.dart';
 import 'runList.dart';
 import "Models/Run.dart";
 import 'settingsScreen.dart';
+import 'dart:convert';
 
 void main() {
   runApp(const MyApp());
@@ -173,6 +174,14 @@ class _MyHomePageState extends State<MyHomePage> {
               itemCount: _items.length,
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
+                  leading: _items[index].image != null && _items[index].image!.isNotEmpty
+                      ? Image.memory(
+                          base64Decode(_items[index].image!),
+                          width: 50,
+                          height: 50,
+                          fit: BoxFit.cover,
+                        )
+                      : const Icon(Icons.directions_boat, size: 50),
                   title: Text(_items[index].name.toString()),
                   subtitle: Text(_items[index].boatClass.toString()),
                   onTap: () {

@@ -1,14 +1,14 @@
 import 'dart:convert';
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
+import 'package:exdata_collector/Services/LocalSaver.dart';
 import 'package:http/http.dart' as http;
 import 'package:exdata_collector/Models/Boat.dart';
 import 'package:exdata_collector/Models/Run.dart';
 import 'package:exdata_collector/Models/Race.dart';
 
 class OnlineSaver {
-  static const String baseUrl = 'http://127.0.0.1:5000';
-
   static Future<void> SynchronizeRaces() async {
+    String baseUrl = await LocalSaver.getBackendUrl();
     List<Race> races = await LocalDataManager.shared.loadAll<Race>(Race);
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'raceList': races.map((race) => race.toJson()).toList()});
@@ -38,6 +38,7 @@ class OnlineSaver {
   }
 
   static Future<void> Synchronize() async {
+    String baseUrl = await LocalSaver.getBackendUrl();
     List<Boat> boats = await LocalDataManager.shared.loadAll<Boat>(Boat);
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'boatList': boats.map((boat) => boat.toJson()).toList()});
@@ -72,6 +73,7 @@ class OnlineSaver {
   }
 
   static Future<void> SynchronizeRun(List<Boat> currentBoats) async {
+    String baseUrl = await LocalSaver.getBackendUrl();
     List<Run> runs = await LocalDataManager.shared.loadAll<Run>(Run);
     List<Race> races = await LocalDataManager.shared.loadAll<Race>(Race);
     List<Run> filteredRuns = [];
@@ -128,6 +130,7 @@ class OnlineSaver {
   }
 
   static Future<void> saveRunData({required Run run}) async {
+    String baseUrl = await LocalSaver.getBackendUrl();
     final url = Uri.parse('$baseUrl/runs');
     final response = await http.post(
       url,
@@ -143,6 +146,7 @@ class OnlineSaver {
   }
 
   static Future<List<Run>> loadAllRunData() async {
+    String baseUrl = await LocalSaver.getBackendUrl();
     final url = Uri.parse('$baseUrl/runs');
     final response = await http.get(url);
 
@@ -156,6 +160,7 @@ class OnlineSaver {
   }
 
   static Future<void> saveBoatData({required Boat boat}) async {
+    String baseUrl = await LocalSaver.getBackendUrl();
     final url = Uri.parse('$baseUrl/boats');
     final response = await http.post(
       url,
@@ -171,6 +176,7 @@ class OnlineSaver {
   }
 
   static Future<List<Boat>> loadAllBoats() async {
+    String baseUrl = await LocalSaver.getBackendUrl();
     final url = Uri.parse('$baseUrl/boats');
     final response = await http.get(url);
 
@@ -184,6 +190,7 @@ class OnlineSaver {
   }
 
   static Future<void> saveRaceData({required Race race}) async {
+    String baseUrl = await LocalSaver.getBackendUrl();
     final url = Uri.parse('$baseUrl/races');
     final response = await http.post(
       url,
@@ -199,6 +206,7 @@ class OnlineSaver {
   }
 
   static Future<List<Race>> loadAllRaces() async {
+    String baseUrl = await LocalSaver.getBackendUrl();
     final url = Uri.parse('$baseUrl/races');
     final response = await http.get(url);
 

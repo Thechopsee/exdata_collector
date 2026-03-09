@@ -1,6 +1,9 @@
+import 'dart:convert';
+import 'dart:io';
 import 'package:exdata_collector/Models/Boat.dart';
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
+import 'package:image_picker/image_picker.dart';
 
 class addNewBoatScreen extends StatefulWidget {
   const addNewBoatScreen({Key? key}) : super(key: key);
@@ -14,6 +17,7 @@ class _NewScreenState extends State<addNewBoatScreen> {
   final TextEditingController _textEditingController = TextEditingController();
   final TextEditingController _secondsController = TextEditingController();
   final TextEditingController _explainController = TextEditingController();
+  String? _base64Image;
 
   @override
   void dispose() {
@@ -23,17 +27,49 @@ class _NewScreenState extends State<addNewBoatScreen> {
     super.dispose();
   }
 
+  Future<void> _pickImage() async {
+    final ImagePicker picker = ImagePicker();
+    final XFile? image = await picker.pickImage(
+      source: ImageSource.gallery,
+      maxWidth: 300,
+      maxHeight: 300,
+    );
+
+    if (image != null) {
+      final bytes = await File(image.path).readAsBytes();
+      setState(() {
+        _base64Image = base64Encode(bytes);
+      });
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('Add Boat'),
       ),
-      body: Padding(
+      body: SingleChildScrollView(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            const SizedBox(height: 20),
+            Center(
+              child: GestureDetector(
+                onTap: _pickImage,
+                child: CircleAvatar(
+                  radius: 50,
+                  backgroundColor: Colors.grey[200],
+                  backgroundImage: _base64Image != null
+                      ? MemoryImage(base64Decode(_base64Image!))
+                      : null,
+                  child: _base64Image == null
+                      ? const Icon(Icons.add_a_photo, size: 40)
+                      : null,
+                ),
+              ),
+            ),
             const SizedBox(height: 20),
             const Text(
               'Category:',
@@ -48,7 +84,6 @@ class _NewScreenState extends State<addNewBoatScreen> {
                   onChanged: (value) {
                     setState(() {
                       _selectedOption = value;
-                      // Vyčistit extra pole když změní na EX-500
                       _secondsController.clear();
                       _explainController.clear();
                     });
@@ -80,8 +115,6 @@ class _NewScreenState extends State<addNewBoatScreen> {
                 border: OutlineInputBorder(),
               ),
             ),
-
-            // Podmíněné zobrazení polí pro EX-A
             if (_selectedOption == 'EX-A') ...[
               const SizedBox(height: 20),
               const Text(
@@ -111,7 +144,6 @@ class _NewScreenState extends State<addNewBoatScreen> {
                 ),
               ),
             ],
-
             const SizedBox(height: 20),
             ElevatedButton(
               onPressed: () {
@@ -125,7 +157,6 @@ class _NewScreenState extends State<addNewBoatScreen> {
                   return;
                 }
 
-                // Pokud je EX-A, ověřit, že číslo i text jsou vyplněné
                 if (_selectedOption == 'EX-A') {
                   if (_secondsController.text.isEmpty ||
                       int.tryParse(_secondsController.text) == null) {
@@ -143,13 +174,11 @@ class _NewScreenState extends State<addNewBoatScreen> {
                     return;
                   }
                 }
-                var boat=Boat(name:name,boatClass:_selectedOption.toString() );
-                boat.timerSeconds=_secondsController.text;
-                boat.timerExplanation=_explainController.text;
+                var boat = Boat(name: name, boatClass: _selectedOption.toString());
+                boat.timerSeconds = _secondsController.text;
+                boat.timerExplanation = _explainController.text;
+                boat.image = _base64Image;
                 LocalDataManager.shared.save(boat);
-
-                print(
-                    'Name: $name, Option: $_selectedOption, Seconds: ${_secondsController.text}, Explanation: ${_explainController.text}');
 
                 Navigator.pop(context);
               },
