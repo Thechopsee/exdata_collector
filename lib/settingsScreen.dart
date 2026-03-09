@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-//import 'package:exdata_collector/Services/LocalSaver.dart';
+import 'package:exdata_collector/Services/SettingsManager.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -10,17 +10,23 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _urlController = TextEditingController();
+  late SettingsManager _settingsManager;
 
   @override
   void initState() {
     super.initState();
+    _initializeSettings();
+  }
+
+  void _initializeSettings() async {
+    _settingsManager = await SettingsManager.getInstance();
     _loadCurrentUrl();
   }
 
   void _loadCurrentUrl() async {
-    //String url = await LocalSaver.getBackendUrl();
+    String url = await _settingsManager.getBackendUrl();
     setState(() {
-      //_urlController.text = url;
+      _urlController.text = url;
     });
   }
 
@@ -33,7 +39,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
   void _saveUrl() async {
     String url = _urlController.text.trim();
     if (url.isNotEmpty) {
-      //await LocalSaver.setBackendUrl(url);
+      await _settingsManager.setBackendUrl(url);
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Backend URL saved successfully')),
       );

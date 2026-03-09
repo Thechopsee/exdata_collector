@@ -6,13 +6,11 @@ import 'package:exdata_collector/Models/Run.dart';
 import 'package:exdata_collector/Models/Race.dart';
 
 class OnlineSaver {
-  static const String baseUrl = 'http://127.0.0.1:5000';
-
   static Future<void> SynchronizeRaces() async {
     List<Race> races = await LocalDataManager.shared.loadAll<Race>(Race);
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'raceList': races.map((race) => race.toJson()).toList()});
-
+    String baseUrl = await SettingsManager.getInstance().getBackendUrl();
     final response = await http.post(Uri.parse(baseUrl + "/races/sync"), headers: headers, body: body);
     if (response.statusCode == 200) {
       print('Races synchronized successfully');
