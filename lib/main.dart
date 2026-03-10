@@ -9,6 +9,7 @@ import 'addNewRaceScreen.dart';
 import 'runList.dart';
 import "Models/Run.dart";
 import 'settingsScreen.dart';
+import 'raceRunList.dart';
 
 void main() {
   runApp(const MyApp());
@@ -102,6 +103,14 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     ).then((_){_loadItems();});
   }
+  void _navigateToRaceRunList(int raceId) async {
+    await Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => RaceRunList(raceId: raceId),
+      ),
+    );
+  }
+
   void  _navigateNewRace() async {
     Navigator.of(context).push(
       MaterialPageRoute(
@@ -206,6 +215,9 @@ class _MyHomePageState extends State<MyHomePage> {
                   subtitle: Text(races[index].date.toString()),
                   onTap: () {
                     //_navigateToNewScreen(_items[index].bID);
+                  },
+                  onLongPress: () {
+                    _navigateToRaceRunList(races[index].rcid);
                   },
                 );
               },

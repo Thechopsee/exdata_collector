@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
+import 'package:exdata_collector/Services/SettingsManager.dart';
 import 'package:http/http.dart' as http;
 import 'package:exdata_collector/Models/Boat.dart';
 import 'package:exdata_collector/Models/Run.dart';
@@ -10,7 +11,7 @@ class OnlineSaver {
     List<Race> races = await LocalDataManager.shared.loadAll<Race>(Race);
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'raceList': races.map((race) => race.toJson()).toList()});
-    String baseUrl = await SettingsManager.getInstance().getBackendUrl();
+    String baseUrl = await (await SettingsManager.getInstance()).getBackendUrl();
     final response = await http.post(Uri.parse(baseUrl + "/races/sync"), headers: headers, body: body);
     if (response.statusCode == 200) {
       print('Races synchronized successfully');
@@ -21,7 +22,6 @@ class OnlineSaver {
 
         for (var updatedRace in updatedRaces) {
           updatedRace.drcid = updatedRace.rcid;
-          // Find local rcid by matching name and date
           for (var localRace in races) {
             if (localRace.name == updatedRace.name &&
                 localRace.date.toIso8601String() == updatedRace.date.toIso8601String()) {
@@ -36,6 +36,7 @@ class OnlineSaver {
   }
 
   static Future<void> Synchronize() async {
+    String baseUrl = await (await SettingsManager.getInstance()).getBackendUrl();
     List<Boat> boats = await LocalDataManager.shared.loadAll<Boat>(Boat);
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'boatList': boats.map((boat) => boat.toJson()).toList()});
@@ -100,6 +101,7 @@ class OnlineSaver {
 
     final headers = {'Content-Type': 'application/json'};
     final body = jsonEncode({'runList': filteredRuns.map((run) => run.toJson()).toList()});
+    String baseUrl = await (await SettingsManager.getInstance()).getBackendUrl();
     final response = await http.post(Uri.parse(baseUrl + "/runs/sync"), headers: headers, body: body);
 
     if (response.statusCode == 200) {
@@ -126,6 +128,7 @@ class OnlineSaver {
   }
 
   static Future<void> saveRunData({required Run run}) async {
+    String baseUrl = await (await SettingsManager.getInstance()).getBackendUrl();
     final url = Uri.parse('$baseUrl/runs');
     final response = await http.post(
       url,
@@ -141,6 +144,7 @@ class OnlineSaver {
   }
 
   static Future<List<Run>> loadAllRunData() async {
+    String baseUrl = await (await SettingsManager.getInstance()).getBackendUrl();
     final url = Uri.parse('$baseUrl/runs');
     final response = await http.get(url);
 
@@ -154,6 +158,7 @@ class OnlineSaver {
   }
 
   static Future<void> saveBoatData({required Boat boat}) async {
+    String baseUrl = await (await SettingsManager.getInstance()).getBackendUrl();
     final url = Uri.parse('$baseUrl/boats');
     final response = await http.post(
       url,
@@ -169,6 +174,7 @@ class OnlineSaver {
   }
 
   static Future<List<Boat>> loadAllBoats() async {
+    String baseUrl = await (await SettingsManager.getInstance()).getBackendUrl();
     final url = Uri.parse('$baseUrl/boats');
     final response = await http.get(url);
 
@@ -182,6 +188,7 @@ class OnlineSaver {
   }
 
   static Future<void> saveRaceData({required Race race}) async {
+    String baseUrl = await (await SettingsManager.getInstance()).getBackendUrl();
     final url = Uri.parse('$baseUrl/races');
     final response = await http.post(
       url,
@@ -197,6 +204,7 @@ class OnlineSaver {
   }
 
   static Future<List<Race>> loadAllRaces() async {
+    String baseUrl = await (await SettingsManager.getInstance()).getBackendUrl();
     final url = Uri.parse('$baseUrl/races');
     final response = await http.get(url);
 
