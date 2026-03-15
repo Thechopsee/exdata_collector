@@ -1,5 +1,5 @@
 from flask import Flask, request, jsonify
-import datetime
+from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
 
 app = Flask(__name__)
@@ -294,6 +294,10 @@ def delete_race(id):
     db.session.commit()
     return jsonify({'result': True})
 
+@app.route('/Heath', methods=['GET'])
+def health_check():
+    return jsonify({'status': 'ok'}), 200
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run(host='10.0.0.19', port=5051, debug=True)
