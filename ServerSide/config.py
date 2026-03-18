@@ -17,15 +17,15 @@ class Config:
                 'database': 'database.db'
             },
             'local2': {
-                'host': '10.0.0.19',
+                'host': '10.0.0.17',
                 'port': 5000,
                 'debug': True,
                 'database': 'database.db'
             },
             'production': {
-                'host': '10.0.0.19',
+                'host': '10.0.0.17',
                 'port': 5051,
-                'debug': False,
+                'debug': True,
                 'database': 'database.db'
             },
         }
