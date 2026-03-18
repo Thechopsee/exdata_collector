@@ -1,9 +1,17 @@
-from flask import Flask, request, jsonify
+from flask import Flask, request, jsonify, render_template
 from datetime import datetime
 from flask_sqlalchemy import SQLAlchemy
+import sys
+import os
+
+sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+from config import Config
+
+env = sys.argv[1] if len(sys.argv) > 1 else 'local'
+config = Config(env)
 
 app = Flask(__name__)
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///database.db'
+app.config['SQLALCHEMY_DATABASE_URI'] = f'sqlite:///{config.get("database")}'
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
 
 db = SQLAlchemy(app)
@@ -15,7 +23,7 @@ class Boat(db.Model):
     timerSeconds = db.Column(db.String)
     timerExplanation = db.Column(db.String)
     runs = db.relationship('Run', backref='boat', lazy=True)
-#DOdelat akce id
+
 class Run(db.Model):
     rid = db.Column(db.Integer, primary_key=True, autoincrement=True)
     boatID = db.Column(db.Integer, db.ForeignKey('boat.bID'), nullable=False)
@@ -178,7 +186,6 @@ def delete_boat(id):
     db.session.commit()
     return jsonify({'message': 'Boat deleted'})
 
-# CRUD for Run
 @app.route('/runs', methods=['POST'])
 def create_run():
     data = request.get_json()
@@ -251,11 +258,9 @@ def delete_run(id):
     return jsonify({'message': 'Run deleted'})
 
 @app.route('/', methods=['GET'])
-def de():
-    db.create_all()
-    return jsonify({'message': 'Database created/updated'})
+def home():
+    return render_template('home.html')
 
-# Create a new Race
 @app.route('/races', methods=['POST'])
 def create_race():
     data = request.get_json()
@@ -300,4 +305,13 @@ def health_check():
 
 
 if __name__ == '__main__':
-    app.run(host='10.0.0.19', port=5051, debug=True)
+    with app.app_context():
+        db.create_all()
+    
+    flask_config = config.get_flask_config()
+    print(f"Starting server with configuration: {env}")
+    print(f"Host: {flask_config['host']}")
+    print(f"Port: {flask_config['port']}")
+    print(f"Debug: {flask_config['debug']}")
+    
+    app.run(**flask_config)
