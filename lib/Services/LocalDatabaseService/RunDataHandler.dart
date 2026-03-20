@@ -14,6 +14,10 @@ class RunDataHandler extends BaseDataHandler {
     int index;
     if (run.rid > 0) {
       index = run.rid;
+      int lastIndex = prefs.getInt("runNums") ?? 0;
+      if (index > lastIndex) {
+        prefs.setInt("runNums", index);
+      }
     } else {
       int lastIndex = prefs.getInt("runNums") ?? 0;
       index = lastIndex + 1;

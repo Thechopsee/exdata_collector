@@ -15,6 +15,10 @@ class RaceDataHandler extends BaseDataHandler {
     int index;
     if (race.rcid > 0) {
       index = race.rcid;
+      int lastIndex = prefs.getInt("raceNums") ?? 0;
+      if (index > lastIndex) {
+        prefs.setInt("raceNums", index);
+      }
     } else {
       int lastIndex = prefs.getInt("raceNums") ?? 0;
       index = lastIndex + 1;

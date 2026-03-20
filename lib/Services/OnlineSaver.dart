@@ -17,19 +17,26 @@ class OnlineSaver {
       print('Races synchronized successfully');
       final List<dynamic> responseData = jsonDecode(response.body);
       if (responseData.isNotEmpty) {
-        List<Race> updatedRaces = responseData.map((data) => Race.fromJson(data)).toList();
-        print('Races synchronized with updates: $updatedRaces');
+        List<Race> serverRaces = responseData.map((data) => Race.fromJson(data)).toList();
+        print('Races synchronized with updates: $serverRaces');
 
-        for (var updatedRace in updatedRaces) {
-          updatedRace.drcid = updatedRace.rcid;
+        for (var serverRace in serverRaces) {
+          Race? localMatch;
           for (var localRace in races) {
-            if (localRace.name == updatedRace.name &&
-                localRace.date.toIso8601String() == updatedRace.date.toIso8601String()) {
-              updatedRace.rcid = localRace.rcid;
+            if ((localRace.drcid != 0 && localRace.drcid == serverRace.drcid) ||
+                (localRace.name == serverRace.name &&
+                    localRace.date.toIso8601String() == serverRace.date.toIso8601String())) {
+              localMatch = localRace;
               break;
             }
           }
-          await LocalDataManager.shared.save(updatedRace);
+
+          if (localMatch != null) {
+            serverRace.rcid = localMatch.rcid;
+          } else {
+            serverRace.rcid = 0; // New race from server
+          }
+          await LocalDataManager.shared.save(serverRace);
         }
       }
     }
@@ -46,23 +53,29 @@ class OnlineSaver {
     if (response.statusCode == 200) {
       print('Boats synchronized successfully');
       final List<dynamic> responseData = jsonDecode(response.body);
-      List<Boat> finalBoats = boats;
       if (responseData.isNotEmpty) {
-        List<Boat> updatedBoatsFromServer = responseData.map((data) => Boat.fromJson(data)).toList();
-        print('Boats synchronized with updates: $updatedBoatsFromServer');
+        List<Boat> serverBoats = responseData.map((data) => Boat.fromJson(data)).toList();
+        print('Boats synchronized with updates: $serverBoats');
 
-        for (var updatedBoat in updatedBoatsFromServer) {
-          // Find local bID by matching name and boatClass
+        for (var serverBoat in serverBoats) {
+          Boat? localMatch;
           for (var localBoat in boats) {
-            if (localBoat.name == updatedBoat.name && localBoat.boatClass == updatedBoat.boatClass) {
-              updatedBoat.bID = localBoat.bID;
+            if ((localBoat.dbID != 0 && localBoat.dbID == serverBoat.dbID) ||
+                (localBoat.name == serverBoat.name && localBoat.boatClass == serverBoat.boatClass)) {
+              localMatch = localBoat;
               break;
             }
           }
-          await LocalDataManager.shared.save(updatedBoat);
+
+          if (localMatch != null) {
+            serverBoat.bID = localMatch.bID;
+          } else {
+            serverBoat.bID = 0; // New boat from server
+          }
+          await LocalDataManager.shared.save(serverBoat);
         }
-        finalBoats = await LocalDataManager.shared.loadAll<Boat>(Boat);
       }
+      List<Boat> finalBoats = await LocalDataManager.shared.loadAll<Boat>(Boat);
       await SynchronizeRaces();
       await SynchronizeRun(finalBoats);
     } else {
@@ -106,23 +119,50 @@ class OnlineSaver {
 
     if (response.statusCode == 200) {
       final List<dynamic> responseData = jsonDecode(response.body);
-      List<Run> updatedRuns = responseData.map((data) => Run.fromJson(data)).toList();
-      print('Runs synchronized with updates: $updatedRuns');
+      List<Run> serverRuns = responseData.map((data) => Run.fromJson(data)).toList();
+      print('Runs synchronized with updates: $serverRuns');
 
-      for (var updatedRun in updatedRuns) {
-        // Re-loading original runs to get local IDs
-        List<Run> localRuns = await LocalDataManager.shared.loadAll<Run>(Run);
-        for(var localRun in localRuns) {
-           // We can match by dateTime and boatID (original local)
-           if (localRun.dateTime.toIso8601String() == updatedRun.dateTime.toIso8601String()) {
-             updatedRun.rid = localRun.rid;
-             updatedRun.boatID = localRun.boatID;
-             updatedRun.rcid = localRun.rcid;
-             break;
-           }
+      for (var serverRun in serverRuns) {
+        // Map server boatID and rcid to local bID and rcid
+        int localBoatID = 0;
+        for (var boat in currentBoats) {
+          if (boat.dbID == serverRun.boatID) {
+            localBoatID = boat.bID;
+            break;
+          }
         }
 
-        await LocalDataManager.shared.save(updatedRun);
+        int localRaceID = 0;
+        for (var race in races) {
+          if (race.drcid == serverRun.rcid) {
+            localRaceID = race.rcid;
+            break;
+          }
+        }
+
+        // Only save if we have valid local mappings
+        if (localBoatID != 0 && localRaceID != 0) {
+          serverRun.boatID = localBoatID;
+          serverRun.rcid = localRaceID;
+
+          Run? localMatch;
+          for (var localRun in runs) {
+            if ((localRun.drid != 0 && localRun.drid == serverRun.drid) ||
+                (localRun.dateTime.toIso8601String() == serverRun.dateTime.toIso8601String() &&
+                    localRun.boatID == serverRun.boatID &&
+                    localRun.rcid == serverRun.rcid)) {
+              localMatch = localRun;
+              break;
+            }
+          }
+
+          if (localMatch != null) {
+            serverRun.rid = localMatch.rid;
+          } else {
+            serverRun.rid = 0; // New run from server
+          }
+          await LocalDataManager.shared.save(serverRun);
+        }
       }
     }
   }
