@@ -46,10 +46,6 @@ class Boat implements AbstractModel {
       };
 
   String toColumnString() {
-    if (dbID != 0) {
-      return "$dbID $name";
-    } else {
-      return "$bID $name";
-    }
+    return "$bID $name";
   }
 }

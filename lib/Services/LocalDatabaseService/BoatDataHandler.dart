@@ -16,6 +16,10 @@ class BoatDataHandler extends BaseDataHandler {
     int index;
     if (boat.bID > 0) {
       index = boat.bID;
+      int lastIndex = prefs.getInt("boatNums") ?? 0;
+      if (index > lastIndex) {
+        prefs.setInt("boatNums", index);
+      }
     } else {
       int lastIndex = prefs.getInt("boatNums") ?? 0;
       index = lastIndex + 1;
