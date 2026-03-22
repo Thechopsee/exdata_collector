@@ -86,34 +86,35 @@ class OnlineSaver {
   static Future<void> SynchronizeRun(List<Boat> currentBoats) async {
     List<Run> runs = await LocalDataManager.shared.loadAll<Run>(Run);
     List<Race> races = await LocalDataManager.shared.loadAll<Race>(Race);
-    List<Run> filteredRuns = [];
+    List<Map<String, dynamic>> runsJson = [];
 
     for (var run in runs) {
-      bool boatFound = false;
+      int? dbBoatID;
       for (var boat in currentBoats) {
         if (run.boatID == boat.bID) {
-          run.boatID = boat.dbID;
-          boatFound = true;
+          dbBoatID = boat.dbID;
           break;
         }
       }
 
-      bool raceFound = false;
+      int? dbRaceID;
       for (var race in races) {
         if (run.rcid == race.rcid) {
-          run.rcid = race.drcid;
-          raceFound = true;
+          dbRaceID = race.drcid;
           break;
         }
       }
 
-      if (boatFound && raceFound) {
-        filteredRuns.add(run);
+      if (dbBoatID != null && dbRaceID != null) {
+        var json = run.toJson();
+        json['boatID'] = dbBoatID;
+        json['rcid'] = dbRaceID;
+        runsJson.add(json);
       }
     }
 
     final headers = {'Content-Type': 'application/json'};
-    final body = jsonEncode({'runList': filteredRuns.map((run) => run.toJson()).toList()});
+    final body = jsonEncode({'runList': runsJson});
     String baseUrl = await (await SettingsManager.getInstance()).getBackendUrl();
     final response = await http.post(Uri.parse(baseUrl + "/runs/sync"), headers: headers, body: body);
 

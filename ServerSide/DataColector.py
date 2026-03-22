@@ -22,6 +22,7 @@ class Boat(db.Model):
     boatClass = db.Column(db.String, nullable=False)
     timerSeconds = db.Column(db.String)
     timerExplanation = db.Column(db.String)
+    image = db.Column(db.String)
     runs = db.relationship('Run', backref='boat', lazy=True)
 
 class Run(db.Model):
@@ -59,7 +60,8 @@ def check_sync_boat():
                 name=x['name'],
                 boatClass=x['boatClass'],
                 timerSeconds=x.get('timerSeconds'),
-                timerExplanation=x.get('timerExplanation')
+                timerExplanation=x.get('timerExplanation'),
+                image=x.get('image')
             )
             db.session.add(new_boat)
             db.session.commit()
@@ -71,7 +73,8 @@ def check_sync_boat():
         'name': boat.name,
         'boatClass': boat.boatClass,
         'timerSeconds': boat.timerSeconds,
-        'timerExplanation': boat.timerExplanation
+        'timerExplanation': boat.timerExplanation,
+        'image': boat.image
     } for boat in boats]
 
     return jsonify(boatArray), 200
@@ -135,7 +138,8 @@ def create_boat():
         name=data['name'],
         boatClass=data['boatClass'],
         timerSeconds=data.get('timerSeconds'),
-        timerExplanation=data.get('timerExplanation')
+        timerExplanation=data.get('timerExplanation'),
+        image=data.get('image')
     )
     db.session.add(new_boat)
     db.session.commit()
@@ -149,7 +153,8 @@ def get_boats():
         'name': boat.name,
         'boatClass': boat.boatClass,
         'timerSeconds': boat.timerSeconds,
-        'timerExplanation': boat.timerExplanation
+        'timerExplanation': boat.timerExplanation,
+        'image': boat.image
     } for boat in boats])
 
 @app.route('/boats/<int:id>', methods=['GET'])
@@ -160,7 +165,8 @@ def get_boat(id):
         'name': boat.name,
         'boatClass': boat.boatClass,
         'timerSeconds': boat.timerSeconds,
-        'timerExplanation': boat.timerExplanation
+        'timerExplanation': boat.timerExplanation,
+        'image': boat.image
     })
 
 @app.route('/boats/<int:id>', methods=['PUT'])
@@ -171,6 +177,7 @@ def update_boat(id):
     boat.boatClass = data['boatClass']
     boat.timerSeconds = data.get('timerSeconds')
     boat.timerExplanation = data.get('timerExplanation')
+    boat.image = data.get('image')
     db.session.commit()
     return jsonify({'message': 'Boat updated'})
 

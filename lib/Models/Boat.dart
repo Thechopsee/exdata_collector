@@ -7,6 +7,7 @@ class Boat implements AbstractModel {
   String? boatClass;
   String? timerSeconds;
   String? timerExplanation;
+  String? image;
 
   Boat({
     this.name,
@@ -21,9 +22,14 @@ class Boat implements AbstractModel {
     if (ad.length > 2) {
       dbID = int.tryParse(ad[2]) ?? 0;
     }
-    if (ad.length >= 5) {
-      timerSeconds = ad[3];
-      timerExplanation = ad[4];
+    if (ad.length > 3) {
+      timerSeconds = ad[3] == "" || ad[3] == "null" ? null : ad[3];
+    }
+    if (ad.length > 4) {
+      timerExplanation = ad[4] == "" || ad[4] == "null" ? null : ad[4];
+    }
+    if (ad.length > 5) {
+      image = ad[5] == "" || ad[5] == "null" ? null : ad[5];
     }
   }
 
@@ -33,7 +39,8 @@ class Boat implements AbstractModel {
         name = json['name'],
         boatClass = json['boatClass'],
         timerSeconds = json['timerSeconds'],
-        timerExplanation = json['timerExplanation'];
+        timerExplanation = json['timerExplanation'],
+        image = json['image'];
 
   @override
   Map<String, dynamic> toJson() => {
@@ -43,6 +50,7 @@ class Boat implements AbstractModel {
         'boatClass': boatClass,
         'timerSeconds': timerSeconds,
         'timerExplanation': timerExplanation,
+        'image': image,
       };
 
   String toColumnString() {

@@ -27,7 +27,7 @@ class BoatDataHandler extends BaseDataHandler {
       boat.bID = index;
     }
 
-    String data = '${boat.name};${boat.boatClass};${boat.dbID};${boat.timerSeconds ?? ""};${boat.timerExplanation ?? ""}';
+    String data = '${boat.name};${boat.boatClass};${boat.dbID};${boat.timerSeconds ?? ""};${boat.timerExplanation ?? ""};${boat.image ?? ""}';
     await prefs.setString('boat$index', data);
   }
 
