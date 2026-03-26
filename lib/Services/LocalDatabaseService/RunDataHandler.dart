@@ -12,10 +12,13 @@ class RunDataHandler extends BaseDataHandler {
     Run run = model as Run;
 
     int index;
+    int lastIndex = prefs.getInt("runNums") ?? 0;
     if (run.rid > 0) {
       index = run.rid;
+      if (index > lastIndex) {
+        prefs.setInt("runNums", index);
+      }
     } else {
-      int lastIndex = prefs.getInt("runNums") ?? 0;
       index = lastIndex + 1;
       prefs.setInt("runNums", index);
       run.rid = index;

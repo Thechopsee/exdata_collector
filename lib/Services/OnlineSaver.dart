@@ -46,12 +46,17 @@ class OnlineSaver {
 
           for (var updatedRace in updatedRaces) {
             updatedRace.drcid = updatedRace.rcid;
+            bool foundLocal = false;
             for (var localRace in races) {
               if (localRace.name == updatedRace.name &&
                   localRace.date.toIso8601String() == updatedRace.date.toIso8601String()) {
                 updatedRace.rcid = localRace.rcid;
+                foundLocal = true;
                 break;
               }
+            }
+            if (!foundLocal) {
+              updatedRace.rcid = 0;
             }
             await LocalDataManager.shared.save(updatedRace);
           }
@@ -83,11 +88,16 @@ class OnlineSaver {
 
           for (var updatedBoat in updatedBoatsFromServer) {
             // Find local bID by matching name and boatClass
+            bool foundLocal = false;
             for (var localBoat in boats) {
               if (localBoat.name == updatedBoat.name && localBoat.boatClass == updatedBoat.boatClass) {
                 updatedBoat.bID = localBoat.bID;
+                foundLocal = true;
                 break;
               }
+            }
+            if (!foundLocal) {
+              updatedBoat.bID = 0;
             }
             await LocalDataManager.shared.save(updatedBoat);
           }
@@ -141,20 +151,38 @@ class OnlineSaver {
 
       if (response.statusCode == 200) {
         final List<dynamic> responseData = jsonDecode(response.body);
-        List<Run> updatedRuns = responseData.map((data) => Run.fromJson(data)).toList();
-        print('Runs synchronized with updates: $updatedRuns');
+        List<Run> updatedRunsFromServer = responseData.map((data) => Run.fromJson(data)).toList();
+        print('Runs synchronized with updates: $updatedRunsFromServer');
 
-        for (var updatedRun in updatedRuns) {
-          // Re-loading original runs to get local IDs
-          List<Run> localRuns = await LocalDataManager.shared.loadAll<Run>(Run);
-          for(var localRun in localRuns) {
-             // We can match by dateTime and boatID (original local)
-             if (localRun.dateTime.toIso8601String() == updatedRun.dateTime.toIso8601String()) {
-               updatedRun.rid = localRun.rid;
-               updatedRun.boatID = localRun.boatID;
-               updatedRun.rcid = localRun.rcid;
-               break;
-             }
+        List<Run> localRuns = await LocalDataManager.shared.loadAll<Run>(Run);
+
+        for (var updatedRun in updatedRunsFromServer) {
+          bool foundLocal = false;
+          for (var localRun in localRuns) {
+            if (localRun.dateTime.toIso8601String() == updatedRun.dateTime.toIso8601String()) {
+              updatedRun.rid = localRun.rid;
+              updatedRun.boatID = localRun.boatID;
+              updatedRun.rcid = localRun.rcid;
+              foundLocal = true;
+              break;
+            }
+          }
+
+          if (!foundLocal) {
+            updatedRun.rid = 0;
+            // Map boatID and rcid from server IDs to local IDs
+            for (var boat in currentBoats) {
+              if (boat.dbID == updatedRun.boatID) {
+                updatedRun.boatID = boat.bID;
+                break;
+              }
+            }
+            for (var race in races) {
+              if (race.drcid == updatedRun.rcid) {
+                updatedRun.rcid = race.rcid;
+                break;
+              }
+            }
           }
 
           await LocalDataManager.shared.save(updatedRun);

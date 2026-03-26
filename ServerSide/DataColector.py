@@ -74,12 +74,7 @@ def check_sync_boat():
         'timerExplanation': boat.timerExplanation
     } for boat in boats]
 
-    if(len(boatArray)!=len(idlist)):
-        isUnsync=True
-    if(isUnsync):
-        return jsonify(boatArray)  
-    else:
-        return jsonify([]),200
+    return jsonify(boatArray),200
               
 @app.route('/runs/sync', methods=['POST'])
 def check_sync_run():
