@@ -128,6 +128,7 @@ class _MyHomePageState extends State<MyHomePage> {
   }
   void _Synchronize() async {
     await OnlineSaver.Synchronize(context: context);
+    await _loadItems();
   }
 
 

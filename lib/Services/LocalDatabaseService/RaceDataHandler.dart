@@ -13,10 +13,13 @@ class RaceDataHandler extends BaseDataHandler {
     Race race = model as Race;
 
     int index;
+    int lastIndex = prefs.getInt("raceNums") ?? 0;
     if (race.rcid > 0) {
       index = race.rcid;
+      if (index > lastIndex) {
+        prefs.setInt("raceNums", index);
+      }
     } else {
-      int lastIndex = prefs.getInt("raceNums") ?? 0;
       index = lastIndex + 1;
       prefs.setInt("raceNums", index);
       race.rcid = index;

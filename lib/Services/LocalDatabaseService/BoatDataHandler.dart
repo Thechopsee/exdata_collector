@@ -14,10 +14,13 @@ class BoatDataHandler extends BaseDataHandler {
     Boat boat = model as Boat;
 
     int index;
+    int lastIndex = prefs.getInt("boatNums") ?? 0;
     if (boat.bID > 0) {
       index = boat.bID;
+      if (index > lastIndex) {
+        prefs.setInt("boatNums", index);
+      }
     } else {
-      int lastIndex = prefs.getInt("boatNums") ?? 0;
       index = lastIndex + 1;
       prefs.setInt("boatNums", index);
       boat.bID = index;
