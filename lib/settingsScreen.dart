@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:exdata_collector/Services/SettingsManager.dart';
 import 'package:exdata_collector/Services/OnlineSaver.dart';
+import 'package:provider/provider.dart';
+import 'Services/ConfigProvider.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -11,6 +13,7 @@ class SettingsScreen extends StatefulWidget {
 
 class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _urlController = TextEditingController();
+  final TextEditingController _colorController = TextEditingController();
   late SettingsManager _settingsManager;
 
   @override
@@ -21,19 +24,22 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _initializeSettings() async {
     _settingsManager = await SettingsManager.getInstance();
-    _loadCurrentUrl();
+    _loadSettings();
   }
 
-  void _loadCurrentUrl() async {
+  void _loadSettings() async {
     String url = await _settingsManager.getBackendUrl();
+    String colorHex = await _settingsManager.getPrimaryColor();
     setState(() {
       _urlController.text = url;
+      _colorController.text = colorHex;
     });
   }
 
   @override
   void dispose() {
     _urlController.dispose();
+    _colorController.dispose();
     super.dispose();
   }
 
@@ -60,30 +66,84 @@ class _SettingsScreenState extends State<SettingsScreen> {
       appBar: AppBar(
         title: const Text('Settings'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            const Text(
-              'Backend URL:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+      body: Consumer<ConfigProvider>(
+        builder: (context, config, child) {
+          return SingleChildScrollView(
+            padding: const EdgeInsets.all(16.0),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                const Text(
+                  'Backend URL:',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _urlController,
+                  decoration: const InputDecoration(
+                    hintText: 'http://127.0.0.1:5000',
+                    border: OutlineInputBorder(),
+                  ),
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: _saveUrl,
+                  child: const Text('Save URL'),
+                ),
+                const Divider(height: 40),
+                const Text(
+                  'Theme Color (Hex ARGB):',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                const SizedBox(height: 10),
+                TextFormField(
+                  controller: _colorController,
+                  decoration: const InputDecoration(
+                    hintText: 'FF673AB7',
+                    border: OutlineInputBorder(),
+                  ),
+                  onFieldSubmitted: (value) {
+                    try {
+                      Color color = Color(int.parse(value, radix: 16));
+                      config.updateTheme(primaryColor: color);
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Invalid color format')),
+                      );
+                    }
+                  },
+                ),
+                const SizedBox(height: 20),
+                ElevatedButton(
+                  onPressed: () {
+                    try {
+                      Color color = Color(int.parse(_colorController.text, radix: 16));
+                      config.updateTheme(primaryColor: color);
+                    } catch (e) {
+                      ScaffoldMessenger.of(context).showSnackBar(
+                        const SnackBar(content: Text('Invalid color format')),
+                      );
+                    }
+                  },
+                  child: const Text('Update Color'),
+                ),
+                const Divider(height: 40),
+                Text(
+                  'Text Size Multiplier: ${config.themeConfig.textSizeMultiplier.toStringAsFixed(2)}',
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+                Slider(
+                  value: config.themeConfig.textSizeMultiplier,
+                  min: 0.5,
+                  max: 2.0,
+                  onChanged: (value) {
+                    config.updateTheme(textSizeMultiplier: value);
+                  },
+                ),
+              ],
             ),
-            const SizedBox(height: 10),
-            TextFormField(
-              controller: _urlController,
-              decoration: const InputDecoration(
-                hintText: 'http://127.0.0.1:5000',
-                border: OutlineInputBorder(),
-              ),
-            ),
-            const SizedBox(height: 20),
-            ElevatedButton(
-              onPressed: _saveUrl,
-              child: const Text('Save'),
-            ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
