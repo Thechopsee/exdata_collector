@@ -1,5 +1,6 @@
 import 'package:exdata_collector/Models/Run.dart';
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
+import 'package:exdata_collector/Services/ConfigProvider.dart';
 import 'package:flutter/material.dart';
 import 'Models/Boat.dart';
 import 'Models/Race.dart';
@@ -84,7 +85,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
   String? _boatSelection;
   String? _raceSelection;
   List<String> _boatOptionsC=[];
-  List<String> options = ['L', 'S', 'P'];
+  List<String> options = ConfigProvider.instance.directionOptions;
   List<Boat> boatOptions=[];
   List<Race> races=[];
   List<String> _racesC=[];
@@ -128,7 +129,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Intended Score
-              _buildLabel('Intended Score:'),
+              _buildLabel(ConfigProvider.instance.labelIntendedScore),
               TextField(
                 controller: _textEditingController,
                 keyboardType: TextInputType.number,
@@ -140,7 +141,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
               const SizedBox(height: 20),
 
               // Intended Direction
-              _buildLabel('Intended Direction:'),
+              _buildLabel(ConfigProvider.instance.labelIntendedDirection),
               _buildRadioGroup(_selectedOption, (val) {
                 setState(() => _selectedOption = val);
               }),
@@ -148,7 +149,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
               const SizedBox(height: 20),
 
               // Gate Part
-              _buildLabel('In with part of gate:'),
+              _buildLabel(ConfigProvider.instance.labelGatePart),
               _buildRadioGroup(_gatePartSelected, (val) {
                 setState(() => _gatePartSelected = val);
               }),
@@ -156,7 +157,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
               const SizedBox(height: 20),
 
               // Gained Score
-              _buildLabel('Gained Score:'),
+              _buildLabel(ConfigProvider.instance.labelGainedScore),
               TextField(
                 controller: _secondTextEditingController,
                 keyboardType: TextInputType.number,
@@ -169,7 +170,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
               const SizedBox(height: 20),
 
               // Hit Direction
-              _buildLabel('Hit Direction:'),
+              _buildLabel(ConfigProvider.instance.labelHitDirection),
               _buildRadioGroup(_secondSelectedOption, (val) {
                 setState(() => _secondSelectedOption = val);
               }),
@@ -233,19 +234,22 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
 
 
   Widget _buildRadioGroup(String? selectedValue, ValueChanged<String?> onChanged) {
-    return Row(
-      children: ['L', 'S', 'P'].map((option) {
-        return Row(
-          children: [
-            Radio<String>(
-              value: option,
-              groupValue: selectedValue,
-              onChanged: onChanged,
-            ),
-            Text(option),
-          ],
-        );
-      }).toList(),
+    return SingleChildScrollView(
+      scrollDirection: Axis.horizontal,
+      child: Row(
+        children: ConfigProvider.instance.directionOptions.map((option) {
+          return Row(
+            children: [
+              Radio<String>(
+                value: option,
+                groupValue: selectedValue,
+                onChanged: onChanged,
+              ),
+              Text(option),
+            ],
+          );
+        }).toList(),
+      ),
     );
   }
 
