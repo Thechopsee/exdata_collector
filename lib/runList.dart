@@ -1,6 +1,7 @@
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:exdata_collector/l10n/app_localizations.dart';
 
 import 'Components/RunItem.dart';
 import 'Helpers/UIHelper.dart';
@@ -56,8 +57,9 @@ class _RunListState extends State<RunList> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
-      appBar: AppBar(title: const Text('Run List')),
+      appBar: AppBar(title: Text(l10n.runListTitle)),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : ListView(

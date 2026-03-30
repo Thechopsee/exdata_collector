@@ -1,6 +1,7 @@
 import 'package:exdata_collector/Models/Boat.dart';
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
+import 'package:exdata_collector/l10n/app_localizations.dart';
 
 class addNewBoatScreen extends StatefulWidget {
   const addNewBoatScreen({Key? key}) : super(key: key);
@@ -25,9 +26,10 @@ class _NewScreenState extends State<addNewBoatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add Boat'),
+        title: Text(l10n.addBoat),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -35,9 +37,9 @@ class _NewScreenState extends State<addNewBoatScreen> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             const SizedBox(height: 20),
-            const Text(
-              'Category:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              l10n.category,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             Row(
@@ -68,46 +70,46 @@ class _NewScreenState extends State<addNewBoatScreen> {
               ],
             ),
             const SizedBox(height: 20),
-            const Text(
-              'Name:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              l10n.name,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             TextFormField(
               controller: _textEditingController,
-              decoration: const InputDecoration(
-                hintText: 'Enter boat name',
-                border: OutlineInputBorder(),
+              decoration: InputDecoration(
+                hintText: l10n.enterBoatName,
+                border: const OutlineInputBorder(),
               ),
             ),
 
             // Podmíněné zobrazení polí pro EX-A
             if (_selectedOption == 'EX-A') ...[
               const SizedBox(height: 20),
-              const Text(
-                'Seconds in timer:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Text(
+                l10n.secondsInTimer,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               TextFormField(
                 controller: _secondsController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  hintText: 'Enter seconds',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: l10n.enterSeconds,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
-              const Text(
-                'Explain setting a timer:',
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              Text(
+                l10n.explainTimer,
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
               const SizedBox(height: 10),
               TextFormField(
                 controller: _explainController,
-                decoration: const InputDecoration(
-                  hintText: 'Explain timer',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: l10n.explainTimerHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
             ],
@@ -118,9 +120,9 @@ class _NewScreenState extends State<addNewBoatScreen> {
                 String name = _textEditingController.text;
 
                 if (name.isEmpty || _selectedOption == null) {
-                  ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                    content: Text('Please fill all fields.'),
-                    duration: Duration(seconds: 2),
+                  ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                    content: Text(l10n.pleaseFillAllFields),
+                    duration: const Duration(seconds: 2),
                   ));
                   return;
                 }
@@ -129,16 +131,16 @@ class _NewScreenState extends State<addNewBoatScreen> {
                 if (_selectedOption == 'EX-A') {
                   if (_secondsController.text.isEmpty ||
                       int.tryParse(_secondsController.text) == null) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Please enter a valid number of seconds.'),
-                      duration: Duration(seconds: 2),
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(l10n.pleaseEnterValidSeconds),
+                      duration: const Duration(seconds: 2),
                     ));
                     return;
                   }
                   if (_explainController.text.isEmpty) {
-                    ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-                      content: Text('Please explain the timer setting.'),
-                      duration: Duration(seconds: 2),
+                    ScaffoldMessenger.of(context).showSnackBar(SnackBar(
+                      content: Text(l10n.pleaseExplainTimer),
+                      duration: const Duration(seconds: 2),
                     ));
                     return;
                   }
@@ -153,7 +155,7 @@ class _NewScreenState extends State<addNewBoatScreen> {
 
                 Navigator.pop(context);
               },
-              child: const Text('Add Boat'),
+              child: Text(l10n.addBoat),
             ),
           ],
         ),

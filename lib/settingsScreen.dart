@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:exdata_collector/Services/SettingsManager.dart';
+import 'package:exdata_collector/l10n/app_localizations.dart';
+import 'package:exdata_collector/main.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -11,6 +13,7 @@ class SettingsScreen extends StatefulWidget {
 class _SettingsScreenState extends State<SettingsScreen> {
   final TextEditingController _urlController = TextEditingController();
   late SettingsManager _settingsManager;
+  String _selectedLocale = 'cs';
 
   @override
   void initState() {
@@ -20,13 +23,15 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
   void _initializeSettings() async {
     _settingsManager = await SettingsManager.getInstance();
-    _loadCurrentUrl();
+    _loadCurrentSettings();
   }
 
-  void _loadCurrentUrl() async {
+  void _loadCurrentSettings() async {
     String url = await _settingsManager.getBackendUrl();
+    String locale = await _settingsManager.getLocale();
     setState(() {
       _urlController.text = url;
+      _selectedLocale = locale;
     });
   }
 
@@ -36,34 +41,40 @@ class _SettingsScreenState extends State<SettingsScreen> {
     super.dispose();
   }
 
-  void _saveUrl() async {
+  void _saveSettings() async {
     String url = _urlController.text.trim();
     if (url.isNotEmpty) {
       await _settingsManager.setBackendUrl(url);
+      await _settingsManager.setLocale(_selectedLocale);
+
+      // Update app locale
+      MyApp.of(context)?.setLocale(Locale(_selectedLocale));
+
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Backend URL saved successfully')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.backendUrlSaved)),
       );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Please enter a valid URL')),
+        SnackBar(content: Text(AppLocalizations.of(context)!.enterValidUrl)),
       );
     }
   }
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Settings'),
+        title: Text(l10n.settings),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const Text(
-              'Backend URL:',
-              style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            Text(
+              l10n.backendUrl,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
             ),
             const SizedBox(height: 10),
             TextFormField(
@@ -74,9 +85,36 @@ class _SettingsScreenState extends State<SettingsScreen> {
               ),
             ),
             const SizedBox(height: 20),
+            Text(
+              l10n.language,
+              style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+            ),
+            const SizedBox(height: 10),
+            DropdownButton<String>(
+              value: _selectedLocale,
+              isExpanded: true,
+              onChanged: (String? newValue) {
+                if (newValue != null) {
+                  setState(() {
+                    _selectedLocale = newValue;
+                  });
+                }
+              },
+              items: [
+                DropdownMenuItem(
+                  value: 'cs',
+                  child: Text(l10n.czech),
+                ),
+                DropdownMenuItem(
+                  value: 'en',
+                  child: Text(l10n.english),
+                ),
+              ],
+            ),
+            const SizedBox(height: 20),
             ElevatedButton(
-              onPressed: _saveUrl,
-              child: const Text('Save'),
+              onPressed: _saveSettings,
+              child: Text(l10n.save),
             ),
           ],
         ),

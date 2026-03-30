@@ -1,5 +1,8 @@
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
+import 'package:exdata_collector/Services/SettingsManager.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_localizations/flutter_localizations.dart';
+import 'package:exdata_collector/l10n/app_localizations.dart';
 import 'Models/Boat.dart';
 import 'Models/Race.dart';
 import 'Services/OnlineSaver.dart';
@@ -11,12 +14,38 @@ import "Models/Run.dart";
 import 'settingsScreen.dart';
 import 'raceRunList.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final settingsManager = await SettingsManager.getInstance();
+  final localeCode = await settingsManager.getLocale();
+  runApp(MyApp(initialLocale: Locale(localeCode)));
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({Key? key}) : super(key: key);
+class MyApp extends StatefulWidget {
+  final Locale initialLocale;
+  const MyApp({Key? key, required this.initialLocale}) : super(key: key);
+
+  static _MyAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<_MyAppState>();
+
+  @override
+  State<MyApp> createState() => _MyAppState();
+}
+
+class _MyAppState extends State<MyApp> {
+  late Locale _locale;
+
+  @override
+  void initState() {
+    super.initState();
+    _locale = widget.initialLocale;
+  }
+
+  void setLocale(Locale value) {
+    setState(() {
+      _locale = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -26,14 +55,24 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MyHomePage(title: 'EXCategory Data Saver'),
+      localizationsDelegates: const [
+        AppLocalizations.delegate,
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
+      ],
+      supportedLocales: const [
+        Locale('en', ''),
+        Locale('cs', ''),
+      ],
+      locale: _locale,
+      home: const MyHomePage(),
     );
   }
 }
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({Key? key, required this.title}) : super(key: key);
-  final String title;
+  const MyHomePage({Key? key}) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
@@ -64,18 +103,19 @@ class _MyHomePageState extends State<MyHomePage> {
     showDialog(
       context: context,
       builder: (BuildContext context) {
+        final l10n = AppLocalizations.of(context)!;
         return AlertDialog(
-          title: Text('Delete Data'),
-          content: Text('Are you sure you want to delete all data?'),
+          title: Text(l10n.deleteConfirmTitle),
+          content: Text(l10n.deleteConfirmContent),
           actions: <Widget>[
             TextButton(
-              child: Text('Cancel'),
+              child: Text(l10n.cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
             TextButton(
-              child: Text('Delete'),
+              child: Text(l10n.delete),
               onPressed: () {
                 LocalDataManager.shared.deleteAll();
                 _loadItems();
@@ -142,10 +182,11 @@ class _MyHomePageState extends State<MyHomePage> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
         backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-        title: Text(widget.title),
+        title: Text(l10n.appTitle),
         actions: <Widget>[
           PopupMenuButton<String>(
             onSelected: (String result) {
@@ -156,13 +197,13 @@ class _MyHomePageState extends State<MyHomePage> {
               }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'settings',
-                child: Text('Settings'),
+                child: Text(l10n.settings),
               ),
-              const PopupMenuItem<String>(
+              PopupMenuItem<String>(
                 value: 'delete',
-                child: Text('Delete Data'),
+                child: Text(l10n.deleteData),
               ),
             ],
           ),
@@ -171,11 +212,11 @@ class _MyHomePageState extends State<MyHomePage> {
       body: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
-          const Padding(
-            padding: EdgeInsets.all(12.0),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
             child: Text(
-              'Boats',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              l10n.boats,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
@@ -200,11 +241,11 @@ class _MyHomePageState extends State<MyHomePage> {
             ),
           ),
           Divider(),
-          const Padding(
-            padding: EdgeInsets.all(12.0),
+          Padding(
+            padding: const EdgeInsets.all(12.0),
             child: Text(
-              'Races',
-              style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+              l10n.races,
+              style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
             ),
           ),
           Expanded(
@@ -233,28 +274,28 @@ class _MyHomePageState extends State<MyHomePage> {
           FloatingActionButton(
             heroTag: 'uniqueTag1',
             onPressed: () {_navigateToNewScreen(-1);},
-            tooltip: 'Add New Score',
+            tooltip: l10n.addScore,
             child: const Icon(Icons.add),
           ),
           const SizedBox(height: 16),
           FloatingActionButton(
             heroTag: 'uniqueTag2',
             onPressed: _navigateToNewBoat,
-            tooltip: 'Navigate to New Boat',
+            tooltip: l10n.addBoat,
             child: const Icon(Icons.directions_boat),
           ),
           const SizedBox(height: 16),
           FloatingActionButton(
             heroTag: 'uniqueTag6',
             onPressed: _navigateNewRace,
-            tooltip: 'Navigate to New Race',
+            tooltip: l10n.addRace,
             child: const Icon(Icons.date_range),
           ),
           const SizedBox(height: 16),
           FloatingActionButton(
             heroTag: 'uniqueTag3',
             onPressed: _Synchronize,
-            tooltip: 'synchronize',
+            tooltip: l10n.synchronize,
             child: const Icon(Icons.sync),
           ),
         ],

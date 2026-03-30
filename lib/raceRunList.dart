@@ -1,6 +1,7 @@
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
+import 'package:exdata_collector/l10n/app_localizations.dart';
 
 import 'Components/RunItem.dart';
 import 'Helpers/UIHelper.dart';
@@ -72,17 +73,18 @@ class _RaceRunListState extends State<RaceRunList> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text(race?.name ?? 'Race Runs'),
+        title: Text(race?.name ?? l10n.raceRunsTitle),
       ),
       body: loading
           ? const Center(child: CircularProgressIndicator())
           : groupedRuns.isEmpty
-              ? const Center(
+              ? Center(
                   child: Text(
-                    'Žádné jízdy pro tento závod',
-                    style: TextStyle(fontSize: 16, color: Colors.grey),
+                    l10n.noRunsForRace,
+                    style: const TextStyle(fontSize: 16, color: Colors.grey),
                   ),
                 )
               : ListView(

@@ -3,6 +3,7 @@ import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.
 import 'package:flutter/material.dart';
 import 'Models/Boat.dart';
 import 'Models/Race.dart';
+import 'package:exdata_collector/l10n/app_localizations.dart';
 
 class addNewScoreScreen extends StatefulWidget {
   const addNewScoreScreen({Key? key, required this.from}) : super(key: key);
@@ -14,19 +15,20 @@ class addNewScoreScreen extends StatefulWidget {
 
 class _addNewScoreScreenState extends State<addNewScoreScreen> {
   void _showNoRacesDialog() {
+    final l10n = AppLocalizations.of(context)!;
     showDialog(
       context: context,
       barrierDismissible: false,
       builder: (context) => AlertDialog(
-        title: const Text("No Race "),
-        content: const Text("Unfortunately, there are no races available"),
+        title: Text(l10n.noRaceTitle),
+        content: Text(l10n.noRaceContent),
         actions: [
           TextButton(
             onPressed: () {
               Navigator.pop(context);
               Navigator.pop(context);
             },
-            child: const Text("OK"),
+            child: Text(l10n.ok),
           ),
         ],
       ),
@@ -34,18 +36,19 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
   }
   Future<void> showNoBoatDialog() async
   {
+    final l10n = AppLocalizations.of(context)!;
     await showDialog(
     context: context,
     builder: (context) => AlertDialog(
-      title: Text('Warning'),
-      content: Text('Zatím nejsou vyplněny žádné lodě.'),
+      title: Text(l10n.warning),
+      content: Text(l10n.noBoatsWarning),
       actions: [
         TextButton(
           onPressed: () {
             Navigator.of(context).pop();
             Navigator.of(context).pop();
           },
-          child: Text('OK'),
+          child: Text(l10n.ok),
         ),
       ],
     ),
@@ -117,9 +120,10 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Add New Record'),
+        title: Text(l10n.addRecordTitle),
       ),
       body: SafeArea(
         child: SingleChildScrollView(
@@ -128,19 +132,19 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               // Intended Score
-              _buildLabel('Intended Score:'),
+              _buildLabel(l10n.intendedScore),
               TextField(
                 controller: _textEditingController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  hintText: 'Score',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: l10n.scoreHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
               const SizedBox(height: 20),
 
               // Intended Direction
-              _buildLabel('Intended Direction:'),
+              _buildLabel(l10n.intendedDirection),
               _buildRadioGroup(_selectedOption, (val) {
                 setState(() => _selectedOption = val);
               }),
@@ -148,7 +152,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
               const SizedBox(height: 20),
 
               // Gate Part
-              _buildLabel('In with part of gate:'),
+              _buildLabel(l10n.gatePart),
               _buildRadioGroup(_gatePartSelected, (val) {
                 setState(() => _gatePartSelected = val);
               }),
@@ -156,20 +160,20 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
               const SizedBox(height: 20),
 
               // Gained Score
-              _buildLabel('Gained Score:'),
+              _buildLabel(l10n.gainedScore),
               TextField(
                 controller: _secondTextEditingController,
                 keyboardType: TextInputType.number,
-                decoration: const InputDecoration(
-                  hintText: 'Score',
-                  border: OutlineInputBorder(),
+                decoration: InputDecoration(
+                  hintText: l10n.scoreHint,
+                  border: const OutlineInputBorder(),
                 ),
               ),
 
               const SizedBox(height: 20),
 
               // Hit Direction
-              _buildLabel('Hit Direction:'),
+              _buildLabel(l10n.hitDirection),
               _buildRadioGroup(_secondSelectedOption, (val) {
                 setState(() => _secondSelectedOption = val);
               }),
@@ -177,14 +181,14 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
               const SizedBox(height: 20),
 
               if (showCombo) ...[
-                _buildLabel('Boat:'),
+                _buildLabel(l10n.boat),
                 _buildDropdown(_boatSelection, _boatOptionsC, (val) {
                   setState(() => _boatSelection = val);
                 }),
                 const SizedBox(height: 20),
               ],
 
-              _buildLabel('Race:'),
+              _buildLabel(l10n.race),
               _buildDropdown(_raceSelection, _racesC, (val) {
                 setState(() => _raceSelection = val);
               }),
@@ -194,7 +198,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
               Center(
                 child: ElevatedButton(
                   onPressed: _handleSubmit,
-                  child: const Text('Save'),
+                  child: Text(l10n.save),
                 ),
               ),
             ],
