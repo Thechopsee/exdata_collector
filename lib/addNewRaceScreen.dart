@@ -2,6 +2,7 @@ import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.
 import 'package:flutter/material.dart';
 import 'Models/Race.dart';
 import 'package:intl/intl.dart';
+import 'package:exdata_collector/l10n/app_localizations.dart';
 
 class AddNewRaceScreen extends StatefulWidget {
   @override
@@ -34,9 +35,10 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        title: Text('Add New Race'),
+        title: Text(l10n.addRaceTitle),
       ),
       body: Padding(
         padding: const EdgeInsets.all(16.0),
@@ -46,10 +48,10 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
             children: <Widget>[
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: 'Name'),
+                decoration: InputDecoration(labelText: l10n.name),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a name';
+                    return l10n.pleaseEnterName;
                   }
                   return null;
                 },
@@ -57,7 +59,7 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
               TextFormField(
                 controller: _dateController,
                 decoration: InputDecoration(
-                  labelText: 'Date (MM/DD/YYYY)',
+                  labelText: l10n.dateLabel,
                   suffixIcon: IconButton(
                     icon: Icon(Icons.calendar_today),
                     onPressed: () async {
@@ -78,12 +80,12 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
-                    return 'Please enter a date';
+                    return l10n.pleaseEnterDate;
                   }
                   try {
                     DateFormat.yMd().parseStrict(value);
                   } catch (e) {
-                    return 'Please enter a valid date';
+                    return l10n.pleaseEnterValidDate;
                   }
                   return null;
                 },
@@ -92,7 +94,7 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
               SizedBox(height: 20),
               ElevatedButton(
                 onPressed: _submitForm,
-                child: Text('Submit'),
+                child: Text(l10n.submit),
               ),
             ],
           ),

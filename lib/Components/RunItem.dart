@@ -1,5 +1,6 @@
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
+import 'package:exdata_collector/l10n/app_localizations.dart';
 import '../Models/Boat.dart';
 import '../Models/Run.dart';
 class RunItem extends StatelessWidget {
@@ -9,15 +10,16 @@ class RunItem extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final l10n = AppLocalizations.of(context)!;
     return FutureBuilder<Boat>(
       future: LocalDataManager.shared.load<Boat>(Boat,run.boatID),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(child: CircularProgressIndicator());
         } else if (snapshot.hasError) {
-          return Text('Chyba při načítání lodi: ${snapshot.error}');
+          return Text('${l10n.errorLoadingBoat}: ${snapshot.error}');
         } else if (!snapshot.hasData) {
-          return const Text('Loď nenalezena');
+          return Text(l10n.boatNotFound);
         }
 
         final boat = snapshot.data!;
@@ -30,7 +32,7 @@ class RunItem extends StatelessWidget {
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
                 Text(
-                  'Run ID: ${run.rid}',
+                  '${l10n.runId}: ${run.rid}',
                   style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16),
                 ),
                 const SizedBox(height: 6),
@@ -38,11 +40,11 @@ class RunItem extends StatelessWidget {
                   children: [
                     const Icon(Icons.directions_boat, size: 16),
                     const SizedBox(width: 4),
-                    Text('Boat: ${boat.name}'),
+                    Text('${l10n.boat} ${boat.name}'),
                     const SizedBox(width: 20),
                     const Icon(Icons.track_changes, size: 16),
                     const SizedBox(width: 4),
-                    Text('Scope To: ${run.scopeTo}'),
+                    Text('${l10n.scopeTo}: ${run.scopeTo}'),
                   ],
                 ),
                 const SizedBox(height: 6),
@@ -50,21 +52,21 @@ class RunItem extends StatelessWidget {
                   children: [
                     const Icon(Icons.arrow_forward, size: 16),
                     const SizedBox(width: 4),
-                    Text('Direction To: ${run.directionTo ?? '-'}'),
+                    Text('${l10n.directionTo}: ${run.directionTo ?? '-'}'),
                     const SizedBox(width: 20),
                     Icon(Icons.check, size: 16, color: run.hit > 0 ? Colors.green : Colors.red),
                     const SizedBox(width: 4),
-                    Text('Hit: ${run.hit}'),
+                    Text('${l10n.hit}: ${run.hit}'),
                     const SizedBox(width: 20),
                     const Icon(Icons.arrow_right_alt, size: 16),
                     const SizedBox(width: 4),
-                    Text('Direction Hit: ${run.directionHit ?? '-'}'),
+                    Text('${l10n.directionHit}: ${run.directionHit ?? '-'}'),
                   ],
                 ),
                 const SizedBox(height: 6),
-                Text('Intended Gate Part: ${run.intendedPartOfGate ?? '-'}'),
+                Text('${l10n.intendedGatePart}: ${run.intendedPartOfGate ?? '-'}'),
                 const SizedBox(height: 6),
-                Text('Date: ${run.dateTime.toLocal()}'),
+                Text('${l10n.date}: ${run.dateTime.toLocal()}'),
               ],
             ),
           ),
