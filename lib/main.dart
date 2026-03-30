@@ -1,5 +1,7 @@
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'Services/ConfigProvider.dart';
 import 'Models/Boat.dart';
 import 'Models/Race.dart';
 import 'Services/OnlineSaver.dart';
@@ -11,8 +13,17 @@ import "Models/Run.dart";
 import 'settingsScreen.dart';
 import 'raceRunList.dart';
 
-void main() {
-  runApp(const MyApp());
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final configProvider = ConfigProvider();
+  await configProvider.loadSettings();
+
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => configProvider,
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -20,13 +31,14 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'EXCategory Data Saver',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(title: 'EXCategory Data Saver'),
+    return Consumer<ConfigProvider>(
+      builder: (context, config, child) {
+        return MaterialApp(
+          title: 'EXCategory Data Saver',
+          theme: config.themeConfig.themeData,
+          home: const MyHomePage(title: 'EXCategory Data Saver'),
+        );
+      },
     );
   }
 }
