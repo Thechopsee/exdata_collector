@@ -30,8 +30,36 @@ class OnlineSaver {
     }
   }
 
-  static Future<void> SynchronizeRaces({BuildContext? context}) async {
+  static Future<bool> checkServerAvailability({BuildContext? context, String? overrideUrl}) async {
     try {
+      String baseUrl = overrideUrl ?? await (await SettingsManager.getInstance()).getBackendUrl();
+      if (baseUrl.isEmpty) return false;
+
+      if (!baseUrl.startsWith('http://') && !baseUrl.startsWith('https://')) {
+        baseUrl = 'http://' + baseUrl;
+      }
+
+      String path = "/Heath";
+      if (baseUrl.endsWith('/')) {
+        baseUrl = baseUrl.substring(0, baseUrl.length - 1);
+      }
+
+      final response = await http.get(Uri.parse(baseUrl + path)).timeout(const Duration(seconds: 5));
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        _showError(context, 'Server je nedostupný: ${response.statusCode}');
+        return false;
+      }
+    } catch (e) {
+      _showError(context, 'Server je nedostupný nebo adresa je neplatná');
+      return false;
+    }
+  }
+
+  static Future<void> SynchronizeRaces({BuildContext? context, bool checkAvailability = true}) async {
+    try {
+      if (checkAvailability && !await checkServerAvailability(context: context)) return;
       List<Race> races = await LocalDataManager.shared.loadAll<Race>(Race);
       final headers = {'Content-Type': 'application/json'};
       final body = jsonEncode({'raceList': races.map((race) => race.toJson()).toList()});
@@ -71,6 +99,7 @@ class OnlineSaver {
 
   static Future<void> Synchronize({BuildContext? context}) async {
     try {
+      if (!await checkServerAvailability(context: context)) return;
       String baseUrl = await (await SettingsManager.getInstance()).getBackendUrl();
       List<Boat> boats = await LocalDataManager.shared.loadAll<Boat>(Boat);
       final headers = {'Content-Type': 'application/json'};
@@ -103,7 +132,7 @@ class OnlineSaver {
           }
           finalBoats = await LocalDataManager.shared.loadAll<Boat>(Boat);
         }
-        await SynchronizeRaces(context: context);
+        await SynchronizeRaces(context: context, checkAvailability: false);
         await SynchronizeRun(finalBoats, context: context);
         _showSuccess(context, 'Synchronizace proběhla úspěšně');
       } else {

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:exdata_collector/Services/SettingsManager.dart';
 import 'package:exdata_collector/l10n/app_localizations.dart';
 import 'package:exdata_collector/main.dart';
+import 'package:exdata_collector/Services/OnlineSaver.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -53,6 +54,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.backendUrlSaved)),
       );
+      bool isAvailable = await OnlineSaver.checkServerAvailability(context: context, overrideUrl: url);
+      if (isAvailable) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Backend URL uložen a server je dostupný'), backgroundColor: Colors.green),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         SnackBar(content: Text(AppLocalizations.of(context)!.enterValidUrl)),
