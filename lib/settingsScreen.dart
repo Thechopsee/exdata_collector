@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:exdata_collector/Services/SettingsManager.dart';
+import 'package:exdata_collector/Services/OnlineSaver.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({Key? key}) : super(key: key);
@@ -40,9 +41,12 @@ class _SettingsScreenState extends State<SettingsScreen> {
     String url = _urlController.text.trim();
     if (url.isNotEmpty) {
       await _settingsManager.setBackendUrl(url);
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Backend URL saved successfully')),
-      );
+      bool isAvailable = await OnlineSaver.checkServerAvailability(context: context, overrideUrl: url);
+      if (isAvailable) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Backend URL uložen a server je dostupný'), backgroundColor: Colors.green),
+        );
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Please enter a valid URL')),
