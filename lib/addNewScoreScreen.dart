@@ -72,9 +72,10 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
     }
 
     _boatSelection = _boatOptionsC[0];
-    if(_racesC.length==0)
+    if(_racesC==null || _racesC.isEmpty )
       {
-        Future.microtask(() => _showNoRacesDialog());
+        await Future.microtask(() => _showNoRacesDialog());
+        return;
       }
     _raceSelection=_racesC[0];
   }

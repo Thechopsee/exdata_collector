@@ -1,3 +1,5 @@
+import 'package:exdata_collector/AboutScreen.dart';
+import 'package:exdata_collector/Helpers/SelfTheme.dart';
 import 'package:exdata_collector/Services/LocalDatabaseService/LocalDataManager.dart';
 import 'package:exdata_collector/Services/SettingsManager.dart';
 import 'package:flutter/material.dart';
@@ -50,11 +52,9 @@ class _MyAppState extends State<MyApp> {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'EXCategory Data Saver',
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
+      title: 'EX-Boat DC',
+      theme: SelfTheme.from(colorScheme: ColorScheme.light()),
+      darkTheme: SelfTheme.from(colorScheme: ColorScheme.dark()),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -91,9 +91,7 @@ class _MyHomePageState extends State<MyHomePage> {
   _loadItems() async {
     List<Boat> loadedItems = await LocalDataManager.shared.loadAll<Boat>(Boat);
     List<Race> loadedRaces = await LocalDataManager.shared.loadAll<Race>(Race);
-    print(loadedRaces);
     setState(() {
-
       races=loadedRaces;
       _items = loadedItems;
     });
@@ -179,6 +177,13 @@ class _MyHomePageState extends State<MyHomePage> {
       ),
     );
   }
+  void _navigateToAbout() {
+    Navigator.of(context).push(
+      MaterialPageRoute(
+        builder: (context) => AboutScreen(),
+      ),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -194,7 +199,10 @@ class _MyHomePageState extends State<MyHomePage> {
                 _deleteData();
               } else if (result == 'settings') {
                 _navigateToSettings();
-              }
+              } else if (result == "about")
+                {
+                  _navigateToAbout();
+                }
             },
             itemBuilder: (BuildContext context) => <PopupMenuEntry<String>>[
               PopupMenuItem<String>(
@@ -204,6 +212,10 @@ class _MyHomePageState extends State<MyHomePage> {
               PopupMenuItem<String>(
                 value: 'delete',
                 child: Text(l10n.deleteData),
+              ),
+              PopupMenuItem<String>(
+                value: 'about',
+                child: Text(l10n.about),
               ),
             ],
           ),

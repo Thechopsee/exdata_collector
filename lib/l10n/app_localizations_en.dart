@@ -195,4 +195,35 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get boatNotFound => 'Boat not found';
+
+  @override
+  String get about => 'About';
+
+  @override
+  String get aboutTitle => 'About App';
+
+  @override
+  String get appName => 'EX-Boat DC';
+
+  @override
+  String get appDescription =>
+      'Application for saving results of EX-500 and EX-A category ship models';
+
+  @override
+  String get author => 'Author';
+
+  @override
+  String get authorName => 'Sebastian Walenta';
+
+  @override
+  String get year => '2026';
+
+  @override
+  String get project => 'Project';
+
+  @override
+  String get projectUrl => 'github.com/Thechopsee/exdata_collector';
+
+  @override
+  String get version => 'Version';
 }

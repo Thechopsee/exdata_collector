@@ -61,5 +61,15 @@
   "intendedGatePart": "Zamýšlená část branky",
   "date": "Datum",
   "errorLoadingBoat": "Chyba při načítání lodi",
-  "boatNotFound": "Loď nenalezena"
+  "boatNotFound": "Loď nenalezena",
+  "about": "O aplikaci",
+  "aboutTitle": "O Aplikaci",
+  "appName": "EX-Boat DC",
+  "appDescription": "Aplikace pro ukládání výsledků modelů lodí kategorií EX-500 a EX-A",
+  "author": "Autor",
+  "authorName": "Sebastian Walenta",
+  "year": "2026",
+  "project": "Projekt",
+  "projectUrl": "github.com/Thechopsee/exdata_collector",
+  "version": "Verze"
 }

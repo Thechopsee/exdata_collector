@@ -193,4 +193,35 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get boatNotFound => 'Loď nenalezena';
+
+  @override
+  String get about => 'O aplikaci';
+
+  @override
+  String get aboutTitle => 'O Aplikaci';
+
+  @override
+  String get appName => 'EX-Boat DC';
+
+  @override
+  String get appDescription =>
+      'Aplikace pro ukládání výsledků modelů lodí kategorií EX-500 a EX-A';
+
+  @override
+  String get author => 'Autor';
+
+  @override
+  String get authorName => 'Sebastian Walenta';
+
+  @override
+  String get year => '2026';
+
+  @override
+  String get project => 'Projekt';
+
+  @override
+  String get projectUrl => 'github.com/Thechopsee/exdata_collector';
+
+  @override
+  String get version => 'Verze';
 }

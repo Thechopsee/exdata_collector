@@ -469,6 +469,66 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Loď nenalezena'**
   String get boatNotFound;
+
+  /// No description provided for @about.
+  ///
+  /// In cs, this message translates to:
+  /// **'O aplikaci'**
+  String get about;
+
+  /// No description provided for @aboutTitle.
+  ///
+  /// In cs, this message translates to:
+  /// **'O Aplikaci'**
+  String get aboutTitle;
+
+  /// No description provided for @appName.
+  ///
+  /// In cs, this message translates to:
+  /// **'EX-Boat DC'**
+  String get appName;
+
+  /// No description provided for @appDescription.
+  ///
+  /// In cs, this message translates to:
+  /// **'Aplikace pro ukládání výsledků modelů lodí kategorií EX-500 a EX-A'**
+  String get appDescription;
+
+  /// No description provided for @author.
+  ///
+  /// In cs, this message translates to:
+  /// **'Autor'**
+  String get author;
+
+  /// No description provided for @authorName.
+  ///
+  /// In cs, this message translates to:
+  /// **'Sebastian Walenta'**
+  String get authorName;
+
+  /// No description provided for @year.
+  ///
+  /// In cs, this message translates to:
+  /// **'2026'**
+  String get year;
+
+  /// No description provided for @project.
+  ///
+  /// In cs, this message translates to:
+  /// **'Projekt'**
+  String get project;
+
+  /// No description provided for @projectUrl.
+  ///
+  /// In cs, this message translates to:
+  /// **'github.com/Thechopsee/exdata_collector'**
+  String get projectUrl;
+
+  /// No description provided for @version.
+  ///
+  /// In cs, this message translates to:
+  /// **'Verze'**
+  String get version;
 }
 
 class _AppLocalizationsDelegate

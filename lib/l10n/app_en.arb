@@ -61,5 +61,15 @@
   "intendedGatePart": "Intended Gate Part",
   "date": "Date",
   "errorLoadingBoat": "Error loading boat",
-  "boatNotFound": "Boat not found"
+  "boatNotFound": "Boat not found",
+  "about": "About",
+  "aboutTitle": "About App",
+  "appName": "EX-Boat DC",
+  "appDescription": "Application for saving results of EX-500 and EX-A category ship models",
+  "author": "Author",
+  "authorName": "Sebastian Walenta",
+  "year": "2026",
+  "project": "Project",
+  "projectUrl": "github.com/Thechopsee/exdata_collector",
+  "version": "Version"
 }
