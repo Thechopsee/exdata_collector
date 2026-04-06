@@ -56,7 +56,7 @@ class _NewScreenState extends State<addNewBoatScreen> {
                     });
                   },
                 ),
-                const Text('ex500'),
+                const Text('EX-500'),
                 Radio<String>(
                   value: 'EX-A',
                   groupValue: _selectedOption,
@@ -66,7 +66,7 @@ class _NewScreenState extends State<addNewBoatScreen> {
                     });
                   },
                 ),
-                const Text('exA'),
+                const Text('EX-A'),
               ],
             ),
             const SizedBox(height: 20),

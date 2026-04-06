@@ -3,6 +3,7 @@ import 'package:shared_preferences/shared_preferences.dart';
 class SettingsManager {
   static const String _backendUrlKey = 'backend_url';
   static const String _localeKey = 'locale';
+  static const String _themeModeKey = 'theme_mode';
   static SettingsManager? _instance;
   static SharedPreferences? _prefs;
 
@@ -30,6 +31,14 @@ class SettingsManager {
 
   Future<String> getLocale() async {
     return _prefs?.getString(_localeKey) ?? 'cs';
+  }
+
+  Future<void> setThemeMode(String themeMode) async {
+    await _prefs?.setString(_themeModeKey, themeMode);
+  }
+
+  Future<String> getThemeMode() async {
+    return _prefs?.getString(_themeModeKey) ?? 'system';
   }
 
   Future<void> clearAllSettings() async {

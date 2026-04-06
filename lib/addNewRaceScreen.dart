@@ -24,13 +24,20 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
     if (_formKey.currentState!.validate()) {
       Race newRace = Race(
         name: _nameController.text,
-        date: DateFormat.yMd().parse(_dateController.text),
+        date: DateFormat('dd/MM/yyyy').parse(_dateController.text),
         rcid: 0,
         drcid: 0,
       );
       await LocalDataManager.shared.save(newRace);
       Navigator.pop(context);
     }
+  }
+
+  Widget _buildLabel(String text) {
+    return Text(
+      text,
+      style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+    );
   }
 
   @override
@@ -44,11 +51,17 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
-          child: ListView(
-            children: <Widget>[
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              _buildLabel(l10n.name),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _nameController,
-                decoration: InputDecoration(labelText: l10n.name),
+                decoration: InputDecoration(
+                  hintText: l10n.name,
+                  border: const OutlineInputBorder(),
+                ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return l10n.pleaseEnterName;
@@ -56,10 +69,13 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
                   return null;
                 },
               ),
+              const SizedBox(height: 20),
+              _buildLabel(l10n.dateLabel),
+              const SizedBox(height: 10),
               TextFormField(
                 controller: _dateController,
                 decoration: InputDecoration(
-                  labelText: l10n.dateLabel,
+                  hintText: l10n.dateLabel,
                   suffixIcon: IconButton(
                     icon: Icon(Icons.calendar_today),
                     onPressed: () async {
@@ -70,20 +86,21 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
                         lastDate: DateTime(2100),
                       );
                       if (pickedDate != null) {
-                        String formattedDate = DateFormat.yMd().format(pickedDate);
+                        String formattedDate = DateFormat('dd/MM/yyyy').format(pickedDate);
                         setState(() {
                           _dateController.text = formattedDate;
                         });
                       }
                     },
                   ),
+                  border: const OutlineInputBorder(),
                 ),
                 validator: (value) {
                   if (value == null || value.isEmpty) {
                     return l10n.pleaseEnterDate;
                   }
                   try {
-                    DateFormat.yMd().parseStrict(value);
+                    DateFormat('dd/MM/yyyy').parseStrict(value);
                   } catch (e) {
                     return l10n.pleaseEnterValidDate;
                   }
@@ -91,10 +108,12 @@ class _AddNewRaceScreenState extends State<AddNewRaceScreen> {
                 },
               ),
 
-              SizedBox(height: 20),
-              ElevatedButton(
-                onPressed: _submitForm,
-                child: Text(l10n.submit),
+              const SizedBox(height: 30),
+              Center(
+                child: ElevatedButton(
+                  onPressed: _submitForm,
+                  child: Text(l10n.submit),
+                ),
               ),
             ],
           ),

@@ -9,7 +9,7 @@ class AppLocalizationsEn extends AppLocalizations {
   AppLocalizationsEn([String locale = 'en']) : super(locale);
 
   @override
-  String get appTitle => 'EXCategory Data Saver';
+  String get appTitle => 'EX-Boat DC';
 
   @override
   String get boats => 'Boats';
@@ -83,7 +83,7 @@ class AppLocalizationsEn extends AppLocalizations {
   String get addRaceTitle => 'Add New Race';
 
   @override
-  String get dateLabel => 'Date (MM/DD/YYYY)';
+  String get dateLabel => 'Date (DD/MM/YYYY)';
 
   @override
   String get pleaseEnterName => 'Please enter a name';
@@ -226,4 +226,16 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get version => 'Version';
+
+  @override
+  String get themeMode => 'Theme Mode';
+
+  @override
+  String get light => 'Light';
+
+  @override
+  String get dark => 'Dark';
+
+  @override
+  String get system => 'System';
 }

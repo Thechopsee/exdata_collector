@@ -23,7 +23,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
         title: Text(l10n.noRaceTitle),
         content: Text(l10n.noRaceContent),
         actions: [
-          TextButton(
+          ElevatedButton(
             onPressed: () {
               Navigator.pop(context);
               Navigator.pop(context);
@@ -43,7 +43,7 @@ class _addNewScoreScreenState extends State<addNewScoreScreen> {
       title: Text(l10n.warning),
       content: Text(l10n.noBoatsWarning),
       actions: [
-        TextButton(
+        ElevatedButton(
           onPressed: () {
             Navigator.of(context).pop();
             Navigator.of(context).pop();

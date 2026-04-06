@@ -101,7 +101,7 @@ abstract class AppLocalizations {
   /// No description provided for @appTitle.
   ///
   /// In cs, this message translates to:
-  /// **'EXCategory Data Saver'**
+  /// **'EX-Boat DC'**
   String get appTitle;
 
   /// No description provided for @boats.
@@ -245,7 +245,7 @@ abstract class AppLocalizations {
   /// No description provided for @dateLabel.
   ///
   /// In cs, this message translates to:
-  /// **'Datum (MM/DD/YYYY)'**
+  /// **'Datum (DD/MM/YYYY)'**
   String get dateLabel;
 
   /// No description provided for @pleaseEnterName.
@@ -529,6 +529,30 @@ abstract class AppLocalizations {
   /// In cs, this message translates to:
   /// **'Verze'**
   String get version;
+
+  /// No description provided for @themeMode.
+  ///
+  /// In cs, this message translates to:
+  /// **'Režim vzhledu'**
+  String get themeMode;
+
+  /// No description provided for @light.
+  ///
+  /// In cs, this message translates to:
+  /// **'Světlý'**
+  String get light;
+
+  /// No description provided for @dark.
+  ///
+  /// In cs, this message translates to:
+  /// **'Tmavý'**
+  String get dark;
+
+  /// No description provided for @system.
+  ///
+  /// In cs, this message translates to:
+  /// **'Systém'**
+  String get system;
 }
 
 class _AppLocalizationsDelegate

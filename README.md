@@ -7,13 +7,3 @@ Aplikace ,pro ukladaní vysledků pro modely lodí kategorie EX-500,EX-A. Aplika
 ## funkce odstranění pozadí je experimentalní a je potřeba nahradit staženou verzi pluginu mistní z backgroudn_remover-0.0.3.zip
 ## Generate diagram
 https://pub.dev/packages/dcdg
-
-## Lokalizace / Localization
-Aplikace používá balíček `flutter_localizations` pro podporu češtiny a angličtiny.
-Pro vygenerování lokalizačních souborů po úpravě `.arb` souborů v `lib/l10n/` spusťte:
-
-```bash
-flutter gen-l10n
-```
-
-Tento příkaz vygeneruje soubory `app_localizations.dart` a další v adresáři `lib/l10n/`.

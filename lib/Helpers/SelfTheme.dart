@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 
 class SelfTheme {
   static const Color ORANGE = Color.fromARGB(255, 255, 80, 0);
@@ -18,12 +19,14 @@ class SelfTheme {
     final bool isDark = colorScheme.brightness == Brightness.dark;
     colorScheme = ColorScheme.fromSeed(seedColor: BLUE, brightness: colorScheme.brightness).copyWith(
       background: isDark ? DARK_GRAY : Colors.white,
+      primary: BLUE,
       error: Color.fromARGB(255, 150, 0, 0),
     );
 
     final Color onPrimarySurfaceColor = isDark ? colorScheme.onSurface : colorScheme.onPrimary;
 
     return ThemeData(
+      useMaterial3: true,
       brightness: colorScheme.brightness, // isDark ? Brightness.dark : Brightness.light,
       primaryColor: BLUE, //colorScheme.primary,
       primaryColorLight: BLUE.withOpacity(0.1),
@@ -47,13 +50,15 @@ class SelfTheme {
       colorScheme: colorScheme,
       unselectedWidgetColor: colorScheme.primary,
       appBarTheme: AppBarTheme(
-        color: isDark ? Color.fromARGB(255, 25, 25, 25) : Colors.white,
-        elevation: 6,
+        scrolledUnderElevation: 0,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: BLUE,
+        elevation: 0,
+        systemOverlayStyle: SystemUiOverlayStyle(statusBarColor: BLUE),
         iconTheme: IconThemeData(
-          color: BLUE,
+          color: Colors.white,
         ),
-        titleTextStyle: TextStyle(color: BLUE, fontSize: 20, fontWeight: FontWeight.w500),
-        foregroundColor: BLUE,
+        titleTextStyle: TextStyle(color: Colors.white, fontSize: 20, fontWeight: FontWeight.w500),
       ),
       disabledColor: isDark ? Colors.white54 : Colors.black45,
       textTheme: TextTheme(
@@ -143,7 +148,6 @@ class SelfTheme {
         backgroundColor: BLUE,
         foregroundColor: Colors.white,
       ),
-      useMaterial3: false,
     );
   }
 }

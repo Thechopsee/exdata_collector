@@ -66,7 +66,7 @@ class RunItem extends StatelessWidget {
                 const SizedBox(height: 6),
                 Text('${l10n.intendedGatePart}: ${run.intendedPartOfGate ?? '-'}'),
                 const SizedBox(height: 6),
-                Text('${l10n.date}: ${run.dateTime.toLocal()}'),
+                Text('${l10n.date}: ${run.dateTime.toLocal().day.toString().padLeft(2, '0')}/${run.dateTime.toLocal().month.toString().padLeft(2, '0')}/${run.dateTime.toLocal().year} ${run.dateTime.toLocal().hour.toString().padLeft(2, '0')}:${run.dateTime.toLocal().minute.toString().padLeft(2, '0')}'),
               ],
             ),
           ),

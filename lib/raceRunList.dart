@@ -32,10 +32,7 @@ class _RaceRunListState extends State<RaceRunList> {
 
   Future<void> _loadRaceData() async {
     try {
-      // Načtení dat závodu
       final raceData = await LocalDataManager.shared.load<Race>(Race, widget.raceId);
-      
-      // Načtení všech jízd pro daný závod
       final runs = await LocalDataManager.shared.loadByParam<Run>(Run, "rcid", widget.raceId.toString());
       
       Map<String, Boat> boatCache = {};
@@ -43,14 +40,12 @@ class _RaceRunListState extends State<RaceRunList> {
       Map<String, Color> tempColors = {};
 
       for (var run in runs) {
-        // Načtení lodi pokud ještě není v cache
         if (!boatCache.containsKey("${run.boatID}")) {
           boatCache["${run.boatID}"] = await LocalDataManager.shared.load<Boat>(Boat, run.boatID);
           tempColors["${run.boatID}"] = UIHelper.generateRandomColor();
         }
         final boat = boatCache["${run.boatID}"]!;
 
-        // Seskupení jízd podle lodí
         if (!tempGrouped.containsKey(boat)) {
           tempGrouped[boat] = [];
         }
@@ -67,7 +62,6 @@ class _RaceRunListState extends State<RaceRunList> {
       setState(() {
         loading = false;
       });
-      // Zde by mohlo být zobrazení chyby
     }
   }
 

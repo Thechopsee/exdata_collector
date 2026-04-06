@@ -36,11 +36,21 @@ class MyApp extends StatefulWidget {
 
 class _MyAppState extends State<MyApp> {
   late Locale _locale;
+  String _themeMode = 'system';
 
   @override
   void initState() {
     super.initState();
     _locale = widget.initialLocale;
+    _initializeThemeMode();
+  }
+
+  Future<void> _initializeThemeMode() async {
+    final settingsManager = await SettingsManager.getInstance();
+    final themeMode = await settingsManager.getThemeMode();
+    setState(() {
+      _themeMode = themeMode;
+    });
   }
 
   void setLocale(Locale value) {
@@ -49,12 +59,31 @@ class _MyAppState extends State<MyApp> {
     });
   }
 
+  void setThemeMode(String value) {
+    setState(() {
+      _themeMode = value;
+    });
+  }
+
+  ThemeMode _getThemeMode() {
+    switch (_themeMode) {
+      case 'light':
+        return ThemeMode.light;
+      case 'dark':
+        return ThemeMode.dark;
+      case 'system':
+      default:
+        return ThemeMode.system;
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
       title: 'EX-Boat DC',
       theme: SelfTheme.from(colorScheme: ColorScheme.light()),
       darkTheme: SelfTheme.from(colorScheme: ColorScheme.dark()),
+      themeMode: _getThemeMode(),
       localizationsDelegates: const [
         AppLocalizations.delegate,
         GlobalMaterialLocalizations.delegate,
@@ -106,13 +135,13 @@ class _MyHomePageState extends State<MyHomePage> {
           title: Text(l10n.deleteConfirmTitle),
           content: Text(l10n.deleteConfirmContent),
           actions: <Widget>[
-            TextButton(
+            ElevatedButton(
               child: Text(l10n.cancel),
               onPressed: () {
                 Navigator.of(context).pop();
               },
             ),
-            TextButton(
+            ElevatedButton(
               child: Text(l10n.delete),
               onPressed: () {
                 LocalDataManager.shared.deleteAll();
@@ -190,7 +219,8 @@ class _MyHomePageState extends State<MyHomePage> {
     final l10n = AppLocalizations.of(context)!;
     return Scaffold(
       appBar: AppBar(
-        backgroundColor: Theme.of(context).colorScheme.inversePrimary,
+        surfaceTintColor: Colors.transparent,
+        backgroundColor: Theme.of(context).primaryColor,
         title: Text(l10n.appTitle),
         actions: <Widget>[
           PopupMenuButton<String>(
@@ -266,7 +296,7 @@ class _MyHomePageState extends State<MyHomePage> {
               itemBuilder: (BuildContext context, int index) {
                 return ListTile(
                   title: Text(races[index].name.toString()),
-                  subtitle: Text(races[index].date.toString()),
+                  subtitle: Text('${races[index].date.day.toString().padLeft(2, '0')}/${races[index].date.month.toString().padLeft(2, '0')}/${races[index].date.year}'),
                   onTap: () {
                     //_navigateToNewScreen(_items[index].bID);
                   },

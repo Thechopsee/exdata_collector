@@ -9,7 +9,7 @@ class AppLocalizationsCs extends AppLocalizations {
   AppLocalizationsCs([String locale = 'cs']) : super(locale);
 
   @override
-  String get appTitle => 'EXCategory Data Saver';
+  String get appTitle => 'EX-Boat DC';
 
   @override
   String get boats => 'Lodě';
@@ -81,7 +81,7 @@ class AppLocalizationsCs extends AppLocalizations {
   String get addRaceTitle => 'Přidat nový závod';
 
   @override
-  String get dateLabel => 'Datum (MM/DD/YYYY)';
+  String get dateLabel => 'Datum (DD/MM/YYYY)';
 
   @override
   String get pleaseEnterName => 'Prosím zadejte jméno';
@@ -224,4 +224,16 @@ class AppLocalizationsCs extends AppLocalizations {
 
   @override
   String get version => 'Verze';
+
+  @override
+  String get themeMode => 'Režim vzhledu';
+
+  @override
+  String get light => 'Světlý';
+
+  @override
+  String get dark => 'Tmavý';
+
+  @override
+  String get system => 'Systém';
 }

@@ -1,6 +1,6 @@
 {
   "@@locale": "cs",
-  "appTitle": "EXCategory Data Saver",
+  "appTitle": "EX-Boat DC",
   "boats": "Lodě",
   "races": "Závody",
   "settings": "Nastavení",
@@ -24,7 +24,7 @@
   "pleaseEnterValidSeconds": "Prosím zadejte platný počet sekund.",
   "pleaseExplainTimer": "Prosím vysvětlete nastavení časovače.",
   "addRaceTitle": "Přidat nový závod",
-  "dateLabel": "Datum (MM/DD/YYYY)",
+  "dateLabel": "Datum (DD/MM/YYYY)",
   "pleaseEnterName": "Prosím zadejte jméno",
   "pleaseEnterDate": "Prosím zadejte datum",
   "pleaseEnterValidDate": "Prosím zadejte platné datum",
@@ -71,5 +71,9 @@
   "year": "2026",
   "project": "Projekt",
   "projectUrl": "github.com/Thechopsee/exdata_collector",
-  "version": "Verze"
+  "version": "Verze",
+  "themeMode": "Režim vzhledu",
+  "light": "Světlý",
+  "dark": "Tmavý",
+  "system": "Systém"
 }

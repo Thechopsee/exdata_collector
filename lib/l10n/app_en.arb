@@ -1,6 +1,6 @@
 {
   "@@locale": "en",
-  "appTitle": "EXCategory Data Saver",
+  "appTitle": "EX-Boat DC",
   "boats": "Boats",
   "races": "Races",
   "settings": "Settings",
@@ -24,7 +24,7 @@
   "pleaseEnterValidSeconds": "Please enter a valid number of seconds.",
   "pleaseExplainTimer": "Please explain the timer setting.",
   "addRaceTitle": "Add New Race",
-  "dateLabel": "Date (MM/DD/YYYY)",
+  "dateLabel": "Date (DD/MM/YYYY)",
   "pleaseEnterName": "Please enter a name",
   "pleaseEnterDate": "Please enter a date",
   "pleaseEnterValidDate": "Please enter a valid date",
@@ -71,5 +71,9 @@
   "year": "2026",
   "project": "Project",
   "projectUrl": "github.com/Thechopsee/exdata_collector",
-  "version": "Version"
+  "version": "Version",
+  "themeMode": "Theme Mode",
+  "light": "Light",
+  "dark": "Dark",
+  "system": "System"
 }
